@@ -1,0 +1,20 @@
+package cs.youtrade.telegram.buttons.sender;
+
+import cs.youtrade.telegram.buttons.data.AbstractUserData;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
+
+public interface IMessageSender<USER extends AbstractUserData, MESSAGE> {
+    /**
+     * Метод отправки сообщения пользователю
+     */
+    void sendMessage(TelegramClient bot, USER user, MESSAGE mes);
+
+    void sendDefErrMes(TelegramClient bot, long chatId);
+
+    void sendTextMes(TelegramClient bot, long chatId, String text);
+
+    void replyCallback(TelegramClient bot, USER user, Update update);
+
+    void deleteMes(TelegramClient bot, USER user, Update update);
+}
