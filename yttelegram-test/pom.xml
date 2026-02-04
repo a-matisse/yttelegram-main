@@ -3,13 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>cs.youtrade</groupId>
-        <artifactId>yttelegram-main</artifactId>
-        <version>1.0.0</version>
-    </parent>
 
+    <groupId>cs.youtrade</groupId>
     <artifactId>yttelegram-test</artifactId>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -59,7 +56,7 @@
             <version>${lombok.version}</version>
         </dependency>
         <dependency>
-            <groupId>cs.youtrade</groupId>
+            <groupId>xyz.youtradecs</groupId>
             <artifactId>yttelegram-buttons</artifactId>
             <version>1.0.0</version>
         </dependency>
