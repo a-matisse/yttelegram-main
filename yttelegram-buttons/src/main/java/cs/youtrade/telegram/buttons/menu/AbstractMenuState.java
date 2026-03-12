@@ -71,6 +71,13 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
                 .toList();
     }
 
+    public MENU_TYPE getOption(String callbackQuery) {
+        for (MENU_TYPE menu : getOptions())
+            if (menu.getOptionName().equals(callbackQuery))
+                return menu;
+        throw new IllegalArgumentException("Unknown menu option: " + callbackQuery);
+    }
+
     @Override
     public InlineKeyboardMarkup buildMarkup() {
         return InlineKeyboardMarkup.builder()
