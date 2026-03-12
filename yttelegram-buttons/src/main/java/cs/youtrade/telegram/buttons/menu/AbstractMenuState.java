@@ -63,7 +63,7 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
                                 InlineKeyboardButton
                                         .builder()
                                         .text(menuOption.getButtonName())
-                                        .callbackData(menuOption.toString())
+                                        .callbackData(menuOption.getOptionName())
                                         .build()
                         )
                         .toList()
