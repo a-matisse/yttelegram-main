@@ -42,7 +42,7 @@ public abstract class AbstractDocMenuState<C, USER extends AbstractUserData, STA
                 .chatId(user.getChatId())
                 .caption(header)
                 .document(doc)
-                .replyMarkup(buildMarkup())
+                .replyMarkup(buildMarkup(user))
                 .parseMode(ParseMode.HTML)
                 .build();
     }

@@ -16,10 +16,10 @@ public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_
         super(sender);
     }
 
-    public SendMessage buildMessage(TelegramClient bot, USER userData) {
+    public SendMessage buildMessage(TelegramClient bot, USER user) {
         String ans = "";
         try {
-            String header = getHeaderText(bot, userData);
+            String header = getHeaderText(bot, user);
             if (header != null)
                 ans = header;
         } catch (Exception ignored) {
@@ -30,8 +30,8 @@ public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_
         return SendMessage
                 .builder()
                 .text(ans)
-                .chatId(userData.getChatId())
-                .replyMarkup(buildMarkup())
+                .chatId(user.getChatId())
+                .replyMarkup(buildMarkup(user))
                 .parseMode(ParseMode.HTML)
                 .build();
     }

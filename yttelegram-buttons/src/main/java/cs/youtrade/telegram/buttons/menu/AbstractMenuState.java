@@ -14,6 +14,9 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -49,26 +52,53 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
     }
 
     @Override
-    public List<InlineKeyboardRow> buildKeyboard() {
+    public List<InlineKeyboardRow> buildKeyboard(USER user) {
         return Arrays
                 .stream(getOptions())
                 .collect(Collectors.groupingBy(IMenuEnum::getRowNum))
                 .entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
-                .map(entry -> new InlineKeyboardRow(entry
-                        .getValue()
-                        .stream()
-                        .map(menuOption ->
-                                InlineKeyboardButton
-                                        .builder()
-                                        .text(menuOption.getButtonName())
-                                        .callbackData(menuOption.getOptionName())
-                                        .build()
-                        )
-                        .toList()
-                ))
+                .map(entry ->
+                        generateRow(entry.getValue(), user))
+                .filter(Objects::nonNull)
                 .toList();
+    }
+
+    private InlineKeyboardRow generateRow(List<MENU_TYPE> buttons, USER user) {
+        var buttonList = buttons
+                .stream()
+                .map(menu ->
+                        generateButton(menu, user))
+                .filter(Objects::nonNull)
+                .toList();
+        return !buttonList.isEmpty()
+                ? new InlineKeyboardRow(buttonList)
+                : null;
+    }
+
+    private InlineKeyboardButton generateButton(MENU_TYPE menuOption, USER user) {
+        // Checking the ability to create the button
+        var visibility = getVisibilityPredicates(user).get(menuOption);
+        if (visibility != null && !visibility.test(user))
+            return null;
+        // Initializing the factory
+        InlineKeyboardButton.InlineKeyboardButtonBuilder<?, ?> builder = InlineKeyboardButton.builder();
+        // Setting the button name if there is any function
+        var textFunction = getTextFunctions(user).get(menuOption);
+        if (textFunction != null)
+            builder.text(textFunction.apply(user));
+        else
+            builder.text(menuOption.getButtonName());
+        // Setting the url for button if there is any
+        // and button should redirect to url
+        var url = getUrls(user).get(menuOption);
+        if (url != null)
+            builder.url(url);
+        else
+            builder.callbackData(menuOption.toString());
+        // Building the button
+        return builder.build();
     }
 
     public MENU_TYPE getOption(String callbackQuery) {
@@ -79,12 +109,24 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
     }
 
     @Override
-    public InlineKeyboardMarkup buildMarkup() {
+    public InlineKeyboardMarkup buildMarkup(USER user) {
         return InlineKeyboardMarkup.builder()
-                .keyboard(buildKeyboard())
+                .keyboard(buildKeyboard(user))
                 .build();
     }
 
     public void executeSide(TelegramClient bot, Update update, USER userData) {
+    }
+
+    public Map<MENU_TYPE, String> getUrls(USER user) {
+        return Map.of();
+    }
+
+    public Map<MENU_TYPE, Predicate<USER>> getVisibilityPredicates(USER user) {
+        return Map.of();
+    }
+
+    public Map<MENU_TYPE, Function<USER, String>> getTextFunctions(USER user) {
+        return Map.of();
     }
 }

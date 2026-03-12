@@ -10,9 +10,9 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import java.util.List;
 
 public interface MenuStateInt<USER extends AbstractUserData, MENU_TYPE extends IMenuEnum, STATE extends Enum<STATE>> {
-    List<InlineKeyboardRow> buildKeyboard();
+    List<InlineKeyboardRow> buildKeyboard(USER user);
 
-    InlineKeyboardMarkup buildMarkup();
+    InlineKeyboardMarkup buildMarkup(USER user);
 
     MENU_TYPE getOption(String optionStr);
 
