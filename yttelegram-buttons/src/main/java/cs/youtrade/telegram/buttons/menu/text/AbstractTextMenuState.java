@@ -4,6 +4,7 @@ import cs.youtrade.telegram.buttons.IMenuEnum;
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.menu.AbstractMenuState;
 import cs.youtrade.telegram.buttons.sender.IMessageSender;
+import cs.youtrade.telegram.buttons.sender.text.BaseTextMessageSender;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -11,7 +12,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_TYPE extends IMenuEnum, STATE extends Enum<STATE>>
         extends AbstractMenuState<USER, MENU_TYPE, STATE, SendMessage> {
     public AbstractTextMenuState(
-            IMessageSender<USER, SendMessage> sender
+            BaseTextMessageSender<USER> sender
     ) {
         super(sender);
     }
@@ -29,8 +30,8 @@ public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_
 
         return SendMessage
                 .builder()
-                .text(ans)
                 .chatId(user.getChatId())
+                .text(ans)
                 .replyMarkup(buildMarkup(user))
                 .parseMode(ParseMode.HTML)
                 .build();
