@@ -13,7 +13,7 @@
     <!-- For uploading on Maven Central -->
     <groupId>xyz.youtradecs</groupId>
     <artifactId>yttelegram-buttons</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
 
     <licenses>
         <license>
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-client</artifactId>
-            <version>9.2.1</version>
+            <version>9.5.0</version>
         </dependency>
         <!-- LOMBOK -->
         <dependency>

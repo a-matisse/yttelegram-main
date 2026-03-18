@@ -2,7 +2,7 @@ package cs.youtrade.telegram.buttons.menu.invoice;
 
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.def.AbstractDefState;
-import cs.youtrade.telegram.buttons.sender.IMessageSender;
+import cs.youtrade.telegram.buttons.sender.invoice.BaseInvoiceMessageSender;
 import cs.youtrade.telegram.buttons.sender.invoice.InvoicePriceData;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class AbstractInvoiceState<USER extends AbstractUserData, STATE extends Enum<STATE>>
         extends AbstractDefState<USER, STATE, SendInvoice> {
     public AbstractInvoiceState(
-            IMessageSender<USER, SendInvoice> sender
+            BaseInvoiceMessageSender<USER> sender
     ) {
         super(sender);
     }
