@@ -1,6 +1,7 @@
 package cs.youtrade.telegram.buttons.sender;
 
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -20,6 +21,7 @@ public interface ISenderService {
     void sendMessage(TelegramClient bot, Long chatId, SendMessage message);
     void sendMessage(TelegramClient bot, Long chatId, SendDocument doc);
     void sendMessage(TelegramClient bot, Long chatId, SendPhoto sendPhoto);
+    void sendMessage(TelegramClient bot, Long chatId, SendInvoice invoice);
     void sendMessage(TelegramClient bot, Long chatId, EditMessageReplyMarkup edit);
     void sendMessage(TelegramClient bot, Long chatId, AnswerCallbackQuery ack);
 }
