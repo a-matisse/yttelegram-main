@@ -16,7 +16,7 @@ public interface MenuStateInt<USER extends AbstractUserData, MENU_TYPE extends I
 
     MENU_TYPE getOption(String optionStr);
 
-    MENU_TYPE[] getOptions();
+    MENU_TYPE[] getOptions(USER user);
 
     STATE executeCallback(TelegramClient bot, Update update, USER user, MENU_TYPE t);
 

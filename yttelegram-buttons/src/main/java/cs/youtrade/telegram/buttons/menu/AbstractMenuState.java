@@ -30,23 +30,23 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
     }
 
     @Override
-    public STATE execute(TelegramClient bot, Update update, USER userData) {
+    public STATE execute(TelegramClient bot, Update update, USER user) {
         // execute side
-        executeSide(bot, update, userData);
+        executeSide(bot, update, user);
 
         if (update.hasCallbackQuery()) {
             String callbackQuery = update.getCallbackQuery().getData();
             try {
-                sender.replyCallback(bot, userData, update);
-                MENU_TYPE menuType = getOption(callbackQuery);
-                return executeCallback(bot, update, userData, menuType);
+                sender.replyCallback(bot, user, update);
+                MENU_TYPE menuType = getOption(callbackQuery, user);
+                return executeCallback(bot, update, user, menuType);
             } catch (Exception e) {
                 log.error("Callback error", e);
             }
         }
 
         if (update.hasMessage() && update.getMessage().hasText())
-            sender.sendMessage(bot, userData, buildMessage(bot, userData));
+            sender.sendMessage(bot, user, buildMessage(bot, user));
 
         return supportedState();
     }
@@ -54,7 +54,7 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
     @Override
     public List<InlineKeyboardRow> buildKeyboard(USER user) {
         return Arrays
-                .stream(getOptions())
+                .stream(getOptions(user))
                 .collect(Collectors.groupingBy(IMenuEnum::getRowNum))
                 .entrySet()
                 .stream()
@@ -101,8 +101,8 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
         return builder.build();
     }
 
-    public MENU_TYPE getOption(String callbackQuery) {
-        for (MENU_TYPE menu : getOptions())
+    public MENU_TYPE getOption(String callbackQuery, USER user) {
+        for (MENU_TYPE menu : getOptions(user))
             if (menu.getOptionName().equals(callbackQuery))
                 return menu;
         throw new IllegalArgumentException("Unknown menu option: " + callbackQuery);
