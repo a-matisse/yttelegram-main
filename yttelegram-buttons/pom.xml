@@ -13,7 +13,7 @@
     <!-- For uploading on Maven Central -->
     <groupId>xyz.youtradecs</groupId>
     <artifactId>yttelegram-buttons</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.11</version>
 
     <licenses>
         <license>

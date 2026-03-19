@@ -21,10 +21,12 @@ public abstract class AbstractInvoiceState<USER extends AbstractUserData, STATE 
 
     @Override
     public SendInvoice buildMessage(TelegramClient bot, USER e) {
+        // Getting the prices for builder
         var labeledPrices = getInvoicePrices(bot, e)
                 .stream()
                 .map(pd -> new LabeledPrice(pd.getName(), pd.getPrice()))
                 .toList();
+        // Initializing the builder for invoice
         var builder = SendInvoice
                 .builder()
                 .providerToken(getProviderToken(bot, e))
@@ -34,7 +36,16 @@ public abstract class AbstractInvoiceState<USER extends AbstractUserData, STATE 
                 .payload(getInvoicePayload(bot, e))
                 .currency(getInvoiceCurrency(bot, e))
                 .prices(labeledPrices);
+        // Setting the photo if exists
+        String photo = getPhotoUrl(bot, e);
+        if (photo != null && !photo.isEmpty())
+            builder.photoUrl(photo);
+        // Completing the build
         return builder.build();
+    }
+
+    public String getPhotoUrl(TelegramClient bot, USER e) {
+        return "";
     }
 
     public abstract String getProviderToken(TelegramClient bot, USER e);
