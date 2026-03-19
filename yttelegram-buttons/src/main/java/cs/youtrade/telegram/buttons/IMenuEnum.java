@@ -6,4 +6,8 @@ public interface IMenuEnum {
     String getOptionName();
 
     int getRowNum();
+
+    default boolean isPay() {
+        return false;
+    }
 }

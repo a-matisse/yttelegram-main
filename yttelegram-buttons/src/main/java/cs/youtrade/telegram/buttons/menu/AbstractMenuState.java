@@ -98,7 +98,9 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU exte
         else
             builder.callbackData(menuOption.toString());
         // Building the button
-        return builder.build();
+        return builder
+                .pay(menuOption.isPay())
+                .build();
     }
 
     public MENU getOption(String callbackQuery, USER user) {
