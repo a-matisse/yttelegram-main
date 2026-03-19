@@ -1,8 +1,7 @@
 package cs.youtrade.telegram.buttons.menu.invoice;
 
-import cs.youtrade.telegram.buttons.IMenuEnum;
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
-import cs.youtrade.telegram.buttons.menu.AbstractMenuState;
+import cs.youtrade.telegram.buttons.def.AbstractDefState;
 import cs.youtrade.telegram.buttons.sender.invoice.BaseInvoiceMessageSender;
 import cs.youtrade.telegram.buttons.sender.invoice.InvoicePriceData;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
@@ -11,8 +10,8 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.List;
 
-public abstract class AbstractInvoiceState<USER extends AbstractUserData, MENU extends IMenuEnum, STATE extends Enum<STATE>>
-        extends AbstractMenuState<USER, MENU, STATE, SendInvoice> {
+public abstract class AbstractInvoiceState<USER extends AbstractUserData, STATE extends Enum<STATE>>
+        extends AbstractDefState<USER, STATE, SendInvoice> {
     public AbstractInvoiceState(
             BaseInvoiceMessageSender<USER> sender
     ) {
@@ -22,12 +21,10 @@ public abstract class AbstractInvoiceState<USER extends AbstractUserData, MENU e
 
     @Override
     public SendInvoice buildMessage(TelegramClient bot, USER e) {
-        // Getting the prices for goods
         var labeledPrices = getInvoicePrices(bot, e)
                 .stream()
                 .map(pd -> new LabeledPrice(pd.getName(), pd.getPrice()))
                 .toList();
-        // Building the base invoice model
         var builder = SendInvoice
                 .builder()
                 .providerToken(getProviderToken(bot, e))
@@ -37,11 +34,6 @@ public abstract class AbstractInvoiceState<USER extends AbstractUserData, MENU e
                 .payload(getInvoicePayload(bot, e))
                 .currency(getInvoiceCurrency(bot, e))
                 .prices(labeledPrices);
-        // Adding markup if not empty
-        var markup = buildMarkup(e);
-        if (markup != null && !markup.getKeyboard().isEmpty())
-            builder.replyMarkup(markup);
-        // Finishing the build
         return builder.build();
     }
 
