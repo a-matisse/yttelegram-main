@@ -20,9 +20,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Log4j2
-public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE extends IMenuEnum, STATE extends Enum<STATE>, MESSAGE>
+public abstract class AbstractMenuState<USER extends AbstractUserData, MENU extends IMenuEnum, STATE extends Enum<STATE>, MESSAGE>
         extends AbstractDefState<USER, STATE, MESSAGE>
-        implements MenuStateInt<USER, MENU_TYPE, STATE> {
+        implements MenuStateInt<USER, MENU, STATE> {
     public AbstractMenuState(
             IMessageSender<USER, MESSAGE> sender
     ) {
@@ -38,7 +38,7 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
             String callbackQuery = update.getCallbackQuery().getData();
             try {
                 sender.replyCallback(bot, user, update);
-                MENU_TYPE menuType = getOption(callbackQuery, user);
+                MENU menuType = getOption(callbackQuery, user);
                 return executeCallback(bot, update, user, menuType);
             } catch (Exception e) {
                 log.error("Callback error", e);
@@ -65,7 +65,7 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
                 .toList();
     }
 
-    private InlineKeyboardRow generateRow(List<MENU_TYPE> buttons, USER user) {
+    private InlineKeyboardRow generateRow(List<MENU> buttons, USER user) {
         var buttonList = buttons
                 .stream()
                 .map(menu ->
@@ -77,7 +77,7 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
                 : null;
     }
 
-    private InlineKeyboardButton generateButton(MENU_TYPE menuOption, USER user) {
+    private InlineKeyboardButton generateButton(MENU menuOption, USER user) {
         // Checking the ability to create the button
         var visibility = getVisibilityPredicates(user).get(menuOption);
         if (visibility != null && !visibility.test(user))
@@ -101,8 +101,8 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
         return builder.build();
     }
 
-    public MENU_TYPE getOption(String callbackQuery, USER user) {
-        for (MENU_TYPE menu : getOptions(user))
+    public MENU getOption(String callbackQuery, USER user) {
+        for (MENU menu : getOptions(user))
             if (menu.getOptionName().equals(callbackQuery))
                 return menu;
         throw new IllegalArgumentException("Unknown menu option: " + callbackQuery);
@@ -118,15 +118,15 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU_TYPE
     public void executeSide(TelegramClient bot, Update update, USER userData) {
     }
 
-    public Map<MENU_TYPE, String> getUrls(USER user) {
+    public Map<MENU, String> getUrls(USER user) {
         return Map.of();
     }
 
-    public Map<MENU_TYPE, Predicate<USER>> getVisibilityPredicates(USER user) {
+    public Map<MENU, Predicate<USER>> getVisibilityPredicates(USER user) {
         return Map.of();
     }
 
-    public Map<MENU_TYPE, Function<USER, String>> getTextFunctions(USER user) {
+    public Map<MENU, Function<USER, String>> getTextFunctions(USER user) {
         return Map.of();
     }
 }
