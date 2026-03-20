@@ -17,6 +17,15 @@ public abstract class BaseImageMessageSender<USER extends AbstractUserData>
     }
 
     @Override
+    public void sendEdit(TelegramClient bot, USER user, EditMessageMedia edit, Consumer<MessageSentData> onMessage) {
+        long chatId = user.getChatId();
+        if (edit == null)
+            sendDefErrMes(bot, user);
+        else
+            sender.sendMessage(bot, chatId, edit, onMessage);
+    }
+
+    @Override
     public void sendMessage(TelegramClient bot, USER user, SendPhoto mes, Consumer<MessageSentData> onMessage) {
         long chatId = user.getChatId();
         if (mes == null)

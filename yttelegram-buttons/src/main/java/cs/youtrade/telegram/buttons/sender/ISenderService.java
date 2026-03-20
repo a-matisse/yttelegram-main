@@ -6,7 +6,9 @@ import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -64,6 +66,20 @@ public interface ISenderService {
             TelegramClient bot,
             Long chatId,
             SendInvoice invoice,
+            Consumer<MessageSentData> onMessage
+    );
+
+    void sendMessage(
+            TelegramClient bot,
+            Long chatId,
+            EditMessageText edit,
+            Consumer<MessageSentData> onMessage
+    );
+
+    void sendMessage(
+            TelegramClient bot,
+            Long chatId,
+            EditMessageMedia edit,
             Consumer<MessageSentData> onMessage
     );
 

@@ -17,6 +17,15 @@ public abstract class BaseInvoiceMessageSender<USER extends AbstractUserData>
     }
 
     @Override
+    public void sendEdit(TelegramClient bot, USER user, EditMessageMedia mes, Consumer<MessageSentData> onMessage) {
+        long chatId = user.getChatId();
+        if (mes == null)
+            sendDefErrMes(bot, user);
+        else
+            sender.sendMessage(bot, chatId, mes, onMessage);
+    }
+
+    @Override
     public void sendMessage(TelegramClient bot, USER user, SendInvoice mes, Consumer<MessageSentData> onMessage) {
         long chatId = user.getChatId();
         if (mes == null)
