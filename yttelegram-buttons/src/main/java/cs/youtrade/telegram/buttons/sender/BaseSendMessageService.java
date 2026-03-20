@@ -1,9 +1,9 @@
 package cs.youtrade.telegram.buttons.sender;
 
+import cs.youtrade.telegram.buttons.TelegramFileDownloader;
 import cs.youtrade.telegram.buttons.util.MessageSentData;
 import lombok.extern.log4j.Log4j2;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
-import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
@@ -108,10 +109,8 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
     @Override
     public InputStream downloadFile(TelegramClient bot, Document doc) {
         try {
-            GetFile gf = new GetFile(doc.getFileId());
-            var tgFile = bot.execute(gf);
-            return bot.downloadFileAsStream(tgFile);
-        } catch (TelegramApiException e) {
+            return TelegramFileDownloader.downloadFileAsStream(bot, doc);
+        } catch (TelegramApiException | IOException e) {
             throw new RuntimeException("Cannot download file from Telegram", e);
         }
     }
@@ -129,11 +128,11 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
     }
 
     @Override
-    public void deleteMes(TelegramClient bot, Long chatId, Long messageId, Consumer<MessageSentData> onMessage) {
+    public void deleteMes(TelegramClient bot, Long chatId, int messageId, Consumer<MessageSentData> onMessage) {
         DeleteMessage delete = DeleteMessage
                 .builder()
                 .chatId(chatId)
-                .messageId(messageId.intValue())
+                .messageId(messageId)
                 .build();
         messageQueue.add(new MessageInfoDto(bot, delete, chatId, onMessage));
     }

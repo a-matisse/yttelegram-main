@@ -18,10 +18,11 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
         EDIT edit = buildEdit(bot, user);
         long lastMessageId = user.getLastMessageId();
         Class<?> mesSupportedEdit = user.getSupportedEdit();
+        Class<?> supportedEdit = supportedEdit();
         // Editing the message if is available
-        if (supportedEdit() != null
+        if (supportedEdit != null
                 && edit != null
-                && supportedEdit().equals(mesSupportedEdit)
+                && supportedEdit.equals(mesSupportedEdit)
                 && lastMessageId > 0
         ) {
             sender.sendEdit(bot, user, edit, null);
@@ -30,18 +31,19 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
             if (mes != null) {
                 // And sending the new message
                 sender.sendMessage(bot, user, mes, data -> {
+                    int prevMessageId = user.getLastMessageId();
                     // Deleting the old message,
                     // because there should be no menu duplicates (at least minimize them)
-                    if (lastMessageId > 0) {
+                    if (prevMessageId > 0) {
                         try {
-                            sender.deleteMes(bot, user, lastMessageId, null);
+                            sender.deleteMes(bot, user, prevMessageId, null);
                         } catch (Exception e) {
                             log.error("Menu deletion aborted: {}", e.getMessage());
                         }
                     }
                     user.setLastMessageId(data.getMessageId());
                     // Setting the new mesSupportedEdit
-                    user.setSupportedEdit(supportedEdit());
+                    user.setSupportedEdit(supportedEdit);
                 });
             } else {
                 sendDefErrMes(bot, user);

@@ -30,7 +30,7 @@ public interface ISenderService {
     void deleteMes(
             TelegramClient bot,
             Long chatId,
-            Long messageId,
+            int messageId,
             Consumer<MessageSentData> onMessage
     );
 

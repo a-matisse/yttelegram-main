@@ -63,7 +63,7 @@ public abstract class BaseMessageSender<USER extends AbstractUserData, MESSAGE, 
     public void deleteMes(
             TelegramClient bot,
             USER user,
-            Long messageId,
+            int messageId,
             Consumer<MessageSentData> onMessage
     ) {
         sender.deleteMes(bot, user.getChatId(), messageId, onMessage);
