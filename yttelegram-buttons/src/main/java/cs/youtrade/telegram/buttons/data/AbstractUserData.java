@@ -14,6 +14,8 @@ public abstract class AbstractUserData {
     private Class<?> supportedEdit;
     @Setter
     private int lastMessageId = -1;
+    @Setter
+    private boolean updated = false;
 
     @Override
     public boolean equals(Object o) {

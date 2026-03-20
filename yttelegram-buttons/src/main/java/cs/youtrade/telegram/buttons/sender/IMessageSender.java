@@ -25,5 +25,5 @@ public interface IMessageSender<USER extends AbstractUserData, MESSAGE, EDIT> {
 
     void replyCallback(TelegramClient bot, USER user, Update update, Consumer<MessageSentData> onMessage);
 
-    void deleteMes(TelegramClient bot, USER user, Long messageId, Consumer<MessageSentData> onMessage);
+    void deleteMes(TelegramClient bot, USER user, int messageId, Consumer<MessageSentData> onMessage);
 }
