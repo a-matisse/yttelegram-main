@@ -2,6 +2,7 @@ package cs.youtrade.telegram.buttons.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -9,6 +10,10 @@ import java.util.Objects;
 @AllArgsConstructor
 public abstract class AbstractUserData {
     private final Long chatId;
+    @Setter
+    private Class<?> supportedEdit;
+    @Setter
+    private long lastMessageId = -1L;
 
     @Override
     public boolean equals(Object o) {

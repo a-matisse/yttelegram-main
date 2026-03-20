@@ -9,17 +9,47 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Log4j2
 @RequiredArgsConstructor
-public abstract class AbstractDefState<USER extends AbstractUserData, STATE extends Enum<STATE>, MESSAGE>
-        implements DefStateInt<USER, STATE, MESSAGE> {
-    protected static final String SERVER_ERROR_MES = "🚫 Сервер временно недоступен. Попробуйте через несколько минут.";
-    protected final IMessageSender<USER, MESSAGE> sender;
+public abstract class AbstractDefState<USER extends AbstractUserData, STATE extends Enum<STATE>, MESSAGE, EDIT>
+        implements DefStateInt<USER, STATE, MESSAGE, EDIT> {
+    protected final IMessageSender<USER, MESSAGE, EDIT> sender;
 
     @Override
     public void executeOnState(TelegramClient bot, Update update, USER user) {
-        sender.sendMessage(bot, user, buildMessage(bot, user));
+        EDIT edit = buildEdit(bot, user);
+        long lastMessageId = user.getLastMessageId();
+        Class<?> mesSupportedEdit = user.getSupportedEdit();
+        // Editing the message if is available
+        if (supportedEdit() != null
+                && edit != null
+                && supportedEdit().equals(mesSupportedEdit)
+                && lastMessageId > 0
+        ) {
+            sender.sendEdit(bot, user, edit, null);
+        } else {
+            MESSAGE mes = buildMessage(bot, user);
+            if (mes != null) {
+                // And sending the new message
+                sender.sendMessage(bot, user, mes, data -> {
+                    // Deleting the old message,
+                    // because there should be no menu duplicates (at least minimize them)
+                    if (lastMessageId > 0) {
+                        try {
+                            sender.deleteMes(bot, user, update, null);
+                        } catch (Exception e) {
+                            log.error("Menu deletion aborted: {}", e.getMessage());
+                        }
+                    }
+                    user.setLastMessageId(data.getMessageId());
+                    // Setting the new mesSupportedEdit
+                    user.setSupportedEdit(supportedEdit());
+                });
+            } else {
+                sendDefErrMes(bot, user);
+            }
+        }
     }
 
-    public void sendDefErrMes(TelegramClient bot, long chatId) {
-        sender.sendDefErrMes(bot, chatId);
+    public void sendDefErrMes(TelegramClient bot, USER user) {
+        sender.sendDefErrMes(bot, user);
     }
 }

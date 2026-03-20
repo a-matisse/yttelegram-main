@@ -1,20 +1,30 @@
 package cs.youtrade.telegram.buttons.sender;
 
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
+import cs.youtrade.telegram.buttons.util.MessageSentData;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-public interface IMessageSender<USER extends AbstractUserData, MESSAGE> {
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+public interface IMessageSender<USER extends AbstractUserData, MESSAGE, EDIT> {
+    void sendEdit(TelegramClient bot, USER user, EDIT edit, Consumer<MessageSentData> onMessage);
+
     /**
-     * Метод отправки сообщения пользователю
+     * Message send method
+     *
+     * @param bot Telegram client
+     * @param user The user with Telegram-chatID
+     * @param mes Message that should be sent
      */
-    void sendMessage(TelegramClient bot, USER user, MESSAGE mes);
+    void sendMessage(TelegramClient bot, USER user, MESSAGE mes, Consumer<MessageSentData> onMessage);
 
-    void sendDefErrMes(TelegramClient bot, long chatId);
+    void sendDefErrMes(TelegramClient bot, USER user);
 
-    void sendTextMes(TelegramClient bot, long chatId, String text);
+    void sendTextMes(TelegramClient bot, USER user, String text);
 
-    void replyCallback(TelegramClient bot, USER user, Update update);
+    void replyCallback(TelegramClient bot, USER user, Update update, Consumer<MessageSentData> onMessage);
 
-    void deleteMes(TelegramClient bot, USER user, Update update);
+    void deleteMes(TelegramClient bot, USER user, Update update, Consumer<MessageSentData> onMessage);
 }

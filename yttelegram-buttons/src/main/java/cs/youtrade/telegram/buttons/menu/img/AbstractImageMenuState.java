@@ -7,13 +7,14 @@ import cs.youtrade.telegram.buttons.sender.img.BaseImageMessageSender;
 import cs.youtrade.telegram.buttons.util.NoContentException;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.io.File;
 
 public abstract class AbstractImageMenuState<USER extends AbstractUserData, MENU_TYPE extends IMenuEnum, STATE extends Enum<STATE>>
-        extends AbstractMenuState<USER, MENU_TYPE, STATE, SendPhoto> {
+        extends AbstractMenuState<USER, MENU_TYPE, STATE, SendPhoto, EditMessageMedia> {
     public AbstractImageMenuState(
             BaseImageMessageSender<USER> sender
     ) {
@@ -30,7 +31,7 @@ public abstract class AbstractImageMenuState<USER extends AbstractUserData, MENU
         var picture = getPicture(bot, user);
         if (picture == null) {
             // If not - throwing exception (cannot create SendPhoto w/o photo)
-            sender.sendDefErrMes(bot, user.getChatId());
+            sendDefErrMes(bot, user);
             throw new NoContentException("No picture found for " + user.getChatId());
         }
         // Setting the picture for message

@@ -20,11 +20,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Log4j2
-public abstract class AbstractMenuState<USER extends AbstractUserData, MENU extends IMenuEnum, STATE extends Enum<STATE>, MESSAGE>
-        extends AbstractDefState<USER, STATE, MESSAGE>
-        implements MenuStateInt<USER, MENU, STATE> {
+public abstract class AbstractMenuState<
+        USER extends AbstractUserData,
+        MENU extends IMenuEnum,
+        STATE extends Enum<STATE>,
+        MESSAGE,
+        EDIT
+        > extends AbstractDefState<USER, STATE, MESSAGE, EDIT> implements MenuStateInt<USER, MENU, STATE> {
     public AbstractMenuState(
-            IMessageSender<USER, MESSAGE> sender
+            IMessageSender<USER, MESSAGE, EDIT> sender
     ) {
         super(sender);
     }
@@ -37,8 +41,11 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU exte
         if (update.hasCallbackQuery()) {
             String callbackQuery = update.getCallbackQuery().getData();
             try {
-                sender.replyCallback(bot, user, update);
+                // Replies so the button will not be highlighted
+                sender.replyCallback(bot, user, update, null);
+                // Gets the next menu
                 MENU menuType = getOption(callbackQuery, user);
+                // Executes the callback
                 return executeCallback(bot, update, user, menuType);
             } catch (Exception e) {
                 log.error("Callback error", e);
@@ -46,7 +53,7 @@ public abstract class AbstractMenuState<USER extends AbstractUserData, MENU exte
         }
 
         if (update.hasMessage() && update.getMessage().hasText())
-            sender.sendMessage(bot, user, buildMessage(bot, user));
+            executeOnState(bot, update, user);
 
         return supportedState();
     }

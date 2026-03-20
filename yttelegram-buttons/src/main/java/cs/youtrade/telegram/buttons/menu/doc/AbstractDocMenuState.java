@@ -5,8 +5,10 @@ import cs.youtrade.telegram.buttons.TelegramFileDownloader;
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.menu.AbstractMenuState;
 import cs.youtrade.telegram.buttons.sender.IMessageSender;
+import cs.youtrade.telegram.buttons.sender.doc.BaseDocMessageSender;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -16,9 +18,9 @@ import java.io.File;
 import java.io.IOException;
 
 public abstract class AbstractDocMenuState<C, USER extends AbstractUserData, STATE extends Enum<STATE>, MENU_TYPE extends IMenuEnum>
-        extends AbstractMenuState<USER, MENU_TYPE, STATE, SendDocument> {
+        extends AbstractMenuState<USER, MENU_TYPE, STATE, SendDocument, EditMessageMedia> {
     public AbstractDocMenuState(
-            IMessageSender<USER, SendDocument> sender
+            BaseDocMessageSender<USER> sender
     ) {
         super(sender);
     }

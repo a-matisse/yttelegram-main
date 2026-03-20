@@ -4,12 +4,13 @@ import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.sender.IMessageSender;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public abstract class AbstractTextState<USER extends AbstractUserData, STATE extends Enum<STATE>>
-        extends AbstractDefState<USER, STATE, SendMessage> {
+        extends AbstractDefState<USER, STATE, SendMessage, EditMessageText> {
     public AbstractTextState(
-            IMessageSender<USER, SendMessage> sender
+            IMessageSender<USER, SendMessage, EditMessageText> sender
     ) {
         super(sender);
     }

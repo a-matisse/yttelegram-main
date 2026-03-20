@@ -8,14 +8,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class BaseMenuRegistry<T extends AbstractUserData, STATE extends Enum<STATE>> {
-    private final Map<STATE, DefStateInt<T, STATE, ?>> registry = new ConcurrentHashMap<>();
+    private final Map<STATE, DefStateInt<T, STATE, ?, ?>> registry = new ConcurrentHashMap<>();
 
-    public BaseMenuRegistry(List<DefStateInt<T, STATE, ?>> commands) {
-        for (DefStateInt<T, STATE, ?> c : commands)
+    public BaseMenuRegistry(List<DefStateInt<T, STATE, ?, ?>> commands) {
+        for (DefStateInt<T, STATE, ?, ?> c : commands)
             registry.put(c.supportedState(), c);
     }
 
-    public DefStateInt<T, STATE, ?> get(STATE state) {
+    public DefStateInt<T, STATE, ?, ?> get(STATE state) {
         return registry.get(state);
     }
 }
