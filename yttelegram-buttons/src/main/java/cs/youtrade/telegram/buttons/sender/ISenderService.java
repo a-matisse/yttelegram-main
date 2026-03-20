@@ -17,27 +17,18 @@ import java.util.function.Consumer;
 public interface ISenderService {
     InputStream downloadFile(
             TelegramClient bot,
-            Document doc,
-            Consumer<MessageSentData> onMessage
+            Document doc
     );
 
     SendMessage createMessage(
             Long chatId,
-            String text,
-            Consumer<MessageSentData> onMessage
+            String text
     );
 
     void deleteMes(
             TelegramClient bot,
             Long chatId,
-            Update update,
-            Consumer<MessageSentData> onMessage
-    );
-
-    void deleteCallback(
-            TelegramClient bot,
-            Long chatId,
-            Update update,
+            Long messageId,
             Consumer<MessageSentData> onMessage
     );
 

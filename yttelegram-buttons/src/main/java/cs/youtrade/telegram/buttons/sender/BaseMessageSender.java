@@ -4,7 +4,6 @@ import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.util.MessageSentData;
 import lombok.RequiredArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
-import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -64,10 +63,10 @@ public abstract class BaseMessageSender<USER extends AbstractUserData, MESSAGE, 
     public void deleteMes(
             TelegramClient bot,
             USER user,
-            Update update,
+            Long messageId,
             Consumer<MessageSentData> onMessage
     ) {
-        sender.deleteMes(bot, user.getChatId(), update, onMessage);
+        sender.deleteMes(bot, user.getChatId(), messageId, onMessage);
     }
 
     public String getDefaultErrorText() {

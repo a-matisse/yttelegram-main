@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public interface IMessageSender<USER extends AbstractUserData, MESSAGE, EDIT> {
     void sendEdit(TelegramClient bot, USER user, EDIT edit, Consumer<MessageSentData> onMessage);
@@ -26,5 +25,5 @@ public interface IMessageSender<USER extends AbstractUserData, MESSAGE, EDIT> {
 
     void replyCallback(TelegramClient bot, USER user, Update update, Consumer<MessageSentData> onMessage);
 
-    void deleteMes(TelegramClient bot, USER user, Update update, Consumer<MessageSentData> onMessage);
+    void deleteMes(TelegramClient bot, USER user, Long messageId, Consumer<MessageSentData> onMessage);
 }

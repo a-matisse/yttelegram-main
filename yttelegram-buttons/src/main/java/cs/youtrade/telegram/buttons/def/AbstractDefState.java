@@ -34,7 +34,7 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
                     // because there should be no menu duplicates (at least minimize them)
                     if (lastMessageId > 0) {
                         try {
-                            sender.deleteMes(bot, user, update, null);
+                            sender.deleteMes(bot, user, lastMessageId, null);
                         } catch (Exception e) {
                             log.error("Menu deletion aborted: {}", e.getMessage());
                         }
