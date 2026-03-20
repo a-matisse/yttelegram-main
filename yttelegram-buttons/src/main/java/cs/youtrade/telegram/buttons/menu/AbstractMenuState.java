@@ -100,7 +100,7 @@ public abstract class AbstractMenuState<
         if (url != null)
             builder.url(url);
         else
-            builder.callbackData(menuOption.toString());
+            builder.callbackData(menuOption.getOptionName());
         // Building the button
         return builder
                 .pay(menuOption.isPay())
