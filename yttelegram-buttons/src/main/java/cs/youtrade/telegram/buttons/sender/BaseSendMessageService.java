@@ -80,19 +80,18 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
             }
             // Executing the message
             TelegramClient bot = messageInfo.getBot();
-            MessageSentData data = new MessageSentData(
-                    switch (messageInfo.getMessageType()) {
-                        case TEXT -> bot.execute(messageInfo.getMessage());
-                        case DOCUMENT -> bot.execute(messageInfo.getDoc());
-                        case PHOTO -> bot.execute(messageInfo.getPhoto());
-                        case EDIT_TEXT -> bot.execute(messageInfo.getEditText());
-                        case EDIT_MEDIA -> bot.execute(messageInfo.getEditMedia());
-                        case EDIT_MARKUP -> bot.execute(messageInfo.getEditMarkup());
-                        case ANSWER_CALLBACK -> bot.execute(messageInfo.getAck());
-                        case DELETE -> bot.execute(messageInfo.getDelete());
-                        case INVOICE -> bot.execute(messageInfo.getInvoice());
-                    }
-            );
+
+            MessageSentData data = switch (messageInfo.getMessageType()) {
+                case TEXT -> new MessageSentData(bot.execute(messageInfo.getMessage()));
+                case DOCUMENT -> new MessageSentData(bot.execute(messageInfo.getDoc()));
+                case PHOTO -> new MessageSentData(bot.execute(messageInfo.getPhoto()));
+                case EDIT_TEXT -> new MessageSentData(bot.execute(messageInfo.getEditText()));
+                case EDIT_MEDIA -> new MessageSentData(bot.execute(messageInfo.getEditMedia()));
+                case EDIT_MARKUP -> new MessageSentData(bot.execute(messageInfo.getEditMarkup()));
+                case ANSWER_CALLBACK -> new MessageSentData(bot.execute(messageInfo.getAck()));
+                case DELETE -> new MessageSentData(bot.execute(messageInfo.getDelete()));
+                case INVOICE -> new MessageSentData(bot.execute(messageInfo.getInvoice()));
+            };
             // Consuming if accessible
             if (data.isAccessible()) messageInfo.getOnMessage().accept(data);
             // Putting the timestamp

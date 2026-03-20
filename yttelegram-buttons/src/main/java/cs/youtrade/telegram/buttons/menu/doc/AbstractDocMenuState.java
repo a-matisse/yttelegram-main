@@ -96,6 +96,11 @@ public abstract class AbstractDocMenuState<C, USER extends AbstractUserData, STA
         return builder.build();
     }
 
+    @Override
+    public Class<EditMessageMedia> supportedEdit() {
+        return EditMessageMedia.class;
+    }
+
     private String getHeader(TelegramClient bot, USER user, C content) {
         try {
             String mainHeader = getHeaderText(bot, user);

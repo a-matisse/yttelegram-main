@@ -94,5 +94,10 @@ public abstract class AbstractImageMenuState<USER extends AbstractUserData, MENU
         return builder.build();
     }
 
+    @Override
+    public Class<EditMessageMedia> supportedEdit() {
+        return EditMessageMedia.class;
+    }
+
     public abstract File getPicture(TelegramClient bot, USER user);
 }
