@@ -52,9 +52,6 @@ public abstract class AbstractMenuState<
             }
         }
 
-        if (update.hasMessage() && update.getMessage().hasText())
-            executeOnState(bot, update, user);
-
         return supportedState();
     }
 
