@@ -54,6 +54,8 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
                 user.setLastMessageId(data.getMessageId());
                 // Setting the new mesSupportedEdit
                 user.setSupportedEdit(supportedEdit);
+                // Refreshing the update flag
+                user.setUpdated(false);
             });
         } else {
             sendDefErrMes(bot, user);
