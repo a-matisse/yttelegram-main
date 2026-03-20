@@ -6,11 +6,14 @@ import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.menu.AbstractMenuState;
 import cs.youtrade.telegram.buttons.sender.IMessageSender;
 import cs.youtrade.telegram.buttons.sender.doc.BaseDocMessageSender;
+import cs.youtrade.telegram.buttons.util.NoContentException;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.media.InputMediaDocument;
+import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -47,6 +50,50 @@ public abstract class AbstractDocMenuState<C, USER extends AbstractUserData, STA
                 .replyMarkup(buildMarkup(user))
                 .parseMode(ParseMode.HTML)
                 .build();
+    }
+
+    @Override
+    public EditMessageMedia buildEdit(TelegramClient bot, USER user) {
+        // Initializing the EditMessageMediaBuilder
+        EditMessageMedia.EditMessageMediaBuilder<?, ?> builder = EditMessageMedia
+                .builder()
+                .chatId(user.getChatId())
+                .messageId(user.getLastMessageId());
+        // Trying to get document from method
+        C content = getContent(user);
+        if (content == null) {
+            sendDefErrMes(bot, user);
+            throw new NoContentException("No document found for " + user.getChatId());
+        }
+        InputFile doc = getHeaderDoc(user, content);
+        if (doc == null) {
+            sendDefErrMes(bot, user);
+            throw new NoContentException("No inputFile found for " + user.getChatId());
+        }
+        // Working only through inputMediaBuilder
+        var inputMediaBuilder = InputMediaDocument
+                .builder()
+                .media(doc.getNewMediaFile(), doc.getMediaName());
+        // Trying to create an answer text
+        String ans = "";
+        try {
+            String header = getHeaderDocText(user, content);
+            if (header != null && !header.isEmpty())
+                ans = header;
+        } catch (Exception ignored) {
+        }
+        // Setting the caption if exists
+        if (!ans.isEmpty()) {
+            inputMediaBuilder.caption(ans);
+            inputMediaBuilder.parseMode(ParseMode.HTML);
+        }
+        // Setting the new replyMarkup
+        builder.replyMarkup(buildMarkup(user));
+        // Completing the media build
+        var inputMedia = inputMediaBuilder.build();
+        builder.media(inputMedia);
+        // Completing the overall build
+        return builder.build();
     }
 
     private String getHeader(TelegramClient bot, USER user, C content) {

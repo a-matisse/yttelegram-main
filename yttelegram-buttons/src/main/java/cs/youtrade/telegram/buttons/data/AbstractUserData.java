@@ -13,7 +13,7 @@ public abstract class AbstractUserData {
     @Setter
     private Class<?> supportedEdit;
     @Setter
-    private long lastMessageId = -1L;
+    private int lastMessageId = -1;
 
     @Override
     public boolean equals(Object o) {

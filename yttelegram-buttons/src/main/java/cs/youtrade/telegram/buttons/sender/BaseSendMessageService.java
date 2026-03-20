@@ -69,27 +69,33 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
         long now = System.currentTimeMillis();
 
         try {
+            // Getting the message from queue
             MessageInfoDto messageInfo = messageQueue.take();
             chatId = messageInfo.getChatId();
             long lastTime = lastTimeSentMessages.getOrDefault(chatId, 0L);
-
+            // Checking the message send interval
             if (now - lastTime < 1020) {
                 messageQueue.offer(messageInfo);
                 return;
             }
-
+            // Executing the message
             TelegramClient bot = messageInfo.getBot();
-            switch (messageInfo.getMessageType()) {
-                case TEXT -> bot.execute(messageInfo.getMessage());
-                case DOCUMENT -> bot.execute(messageInfo.getDoc());
-                case PHOTO -> bot.execute(messageInfo.getPhoto());
-                case EDIT_TEXT -> bot.execute(messageInfo.getEditText());
-                case EDIT_MEDIA -> bot.execute(messageInfo.getEditMedia());
-                case EDIT_MARKUP -> bot.execute(messageInfo.getEditMarkup());
-                case ANSWER_CALLBACK -> bot.execute(messageInfo.getAck());
-                case DELETE -> bot.execute(messageInfo.getDelete());
-                case INVOICE -> bot.execute(messageInfo.getInvoice());
-            }
+            MessageSentData data = new MessageSentData(
+                    switch (messageInfo.getMessageType()) {
+                        case TEXT -> bot.execute(messageInfo.getMessage());
+                        case DOCUMENT -> bot.execute(messageInfo.getDoc());
+                        case PHOTO -> bot.execute(messageInfo.getPhoto());
+                        case EDIT_TEXT -> bot.execute(messageInfo.getEditText());
+                        case EDIT_MEDIA -> bot.execute(messageInfo.getEditMedia());
+                        case EDIT_MARKUP -> bot.execute(messageInfo.getEditMarkup());
+                        case ANSWER_CALLBACK -> bot.execute(messageInfo.getAck());
+                        case DELETE -> bot.execute(messageInfo.getDelete());
+                        case INVOICE -> bot.execute(messageInfo.getInvoice());
+                    }
+            );
+            // Consuming if accessible
+            if (data.isAccessible()) messageInfo.getOnMessage().accept(data);
+            // Putting the timestamp
             lastTimeSentMessages.put(chatId, now);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

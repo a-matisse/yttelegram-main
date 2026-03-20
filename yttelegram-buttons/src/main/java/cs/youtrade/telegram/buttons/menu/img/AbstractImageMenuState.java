@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.io.File;
@@ -24,7 +25,7 @@ public abstract class AbstractImageMenuState<USER extends AbstractUserData, MENU
     @Override
     public SendPhoto buildMessage(TelegramClient bot, USER user) {
         // Initializing the SendPhoto builder for given user
-        SendPhoto.SendPhotoBuilder<?,?> builder = SendPhoto
+        SendPhoto.SendPhotoBuilder<?, ?> builder = SendPhoto
                 .builder()
                 .chatId(user.getChatId());
         // Trying to get picture from method
@@ -52,6 +53,45 @@ public abstract class AbstractImageMenuState<USER extends AbstractUserData, MENU
                 .replyMarkup(buildMarkup(user))
                 .parseMode(ParseMode.HTML)
                 .build();
+    }
+
+    @Override
+    public EditMessageMedia buildEdit(TelegramClient bot, USER user) {
+        // Initializing the EditMessageMediaBuilder
+        EditMessageMedia.EditMessageMediaBuilder<?, ?> builder = EditMessageMedia
+                .builder()
+                .chatId(user.getChatId())
+                .messageId(user.getLastMessageId());
+        // Trying to get picture from method
+        var picture = getPicture(bot, user);
+        if (picture == null) {
+            sendDefErrMes(bot, user);
+            throw new NoContentException("No picture found for " + user.getChatId());
+        }
+        // Working only through inputMediaBuilder
+        var inputMediaBuilder = InputMediaPhoto
+                .builder()
+                .media(picture, picture.getName());
+        // Trying to create an answer text
+        String ans = "";
+        try {
+            String header = getHeaderText(bot, user);
+            if (header != null && !header.isEmpty())
+                ans = header;
+        } catch (Exception ignored) {
+        }
+        // Setting the caption if exists
+        if (!ans.isEmpty()) {
+            inputMediaBuilder.caption(ans);
+            inputMediaBuilder.parseMode(ParseMode.HTML);
+        }
+        // Setting the new replyMarkup
+        builder.replyMarkup(buildMarkup(user));
+        // Completing the media build
+        var inputMedia = inputMediaBuilder.build();
+        builder.media(inputMedia);
+        // Completing the overall build
+        return builder.build();
     }
 
     public abstract File getPicture(TelegramClient bot, USER user);
