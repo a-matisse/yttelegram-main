@@ -94,7 +94,13 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
                 case INVOICE -> new MessageSentData(bot.execute(messageInfo.getInvoice()));
             };
             // Consuming if accessible
-            if (data.isAccessible()) messageInfo.getOnMessage().accept(data);
+            if (data.isAccessible()) {
+                try {
+                    messageInfo.getOnMessage().accept(data);
+                } catch (Exception e) {
+                    log.error("Couldn't invoke onMessage", e);
+                }
+            }
             // Putting the timestamp
             lastTimeSentMessages.put(chatId, now);
         } catch (InterruptedException e) {

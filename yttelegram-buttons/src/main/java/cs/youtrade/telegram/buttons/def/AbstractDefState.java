@@ -32,11 +32,11 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
         ) {
             sender.sendEdit(bot, user, edit, null);
         } else {
-            sendNewMessage(bot, user, supportedEdit);
+            sendNewMessage(bot, update, user, supportedEdit);
         }
     }
 
-    private void sendNewMessage(TelegramClient bot, USER user, Class<?> supportedEdit) {
+    private void sendNewMessage(TelegramClient bot, Update update, USER user, Class<?> supportedEdit) {
         MESSAGE mes = buildMessage(bot, user);
         if (mes != null) {
             // And sending the new message
@@ -44,6 +44,13 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
                 int prevMessageId = user.getLastMessageId();
                 // Deleting the old message,
                 // because there should be no menu duplicates (at least minimize them)
+                if (prevMessageId <= 0) {
+                    if (update.hasCallbackQuery()) {
+                        Integer callbackId = update.getCallbackQuery().getMessage().getMessageId();
+                        if (callbackId != null)
+                            prevMessageId = callbackId;
+                    }
+                }
                 if (prevMessageId > 0) {
                     try {
                         sender.deleteMes(bot, user, prevMessageId, null);

@@ -51,7 +51,11 @@ public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_
 
         return EditMessageText
                 .builder()
+                .chatId(user.getChatId())
+                .messageId(user.getLastMessageId())
                 .text(ans)
+                .replyMarkup(buildMarkup(user))
+                .parseMode(ParseMode.HTML)
                 .build();
     }
 
