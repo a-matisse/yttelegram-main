@@ -19,21 +19,22 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
 
     @Override
     public void executeOnState(TelegramClient bot, Update update, USER user) {
-        EDIT edit = buildEdit(bot, user);
         long lastMessageId = user.getLastMessageId();
         Class<?> mesSupportedEdit = user.getSupportedEdit();
         Class<?> supportedEdit = supportedEdit();
         // Editing the message if is available
         if (supportedEdit != null
-                && edit != null
                 && !user.isUpdated()
                 && supportedEdit.equals(mesSupportedEdit)
                 && lastMessageId > 0
         ) {
-            sender.sendEdit(bot, user, edit, null);
-        } else {
-            sendNewMessage(bot, update, user, supportedEdit);
+            EDIT edit = buildEdit(bot, user);
+            if (edit != null) {
+                sender.sendEdit(bot, user, edit, null);
+                return;
+            }
         }
+        sendNewMessage(bot, update, user, supportedEdit);
     }
 
     private void sendNewMessage(TelegramClient bot, Update update, USER user, Class<?> supportedEdit) {

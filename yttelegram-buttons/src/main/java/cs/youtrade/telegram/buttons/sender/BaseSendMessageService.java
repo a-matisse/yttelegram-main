@@ -93,8 +93,9 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
                 case DELETE -> new MessageSentData(bot.execute(messageInfo.getDelete()));
                 case INVOICE -> new MessageSentData(bot.execute(messageInfo.getInvoice()));
             };
-            // Consuming if accessible
-            if (data.isAccessible()) {
+            // Consuming if accessible and not null
+            var onMessage = messageInfo.getOnMessage();
+            if (data.isAccessible() && onMessage != null) {
                 try {
                     messageInfo.getOnMessage().accept(data);
                 } catch (Exception e) {
