@@ -23,11 +23,12 @@ public abstract class BaseMessageSender<USER extends AbstractUserData, MESSAGE, 
     }
 
     @Override
-    public void sendDefErrMes(
+    public void sendTextMes(
             TelegramClient bot,
-            USER user
+            USER user,
+            String text
     ) {
-        sender.sendMessage(bot, user.getChatId(), getDefaultErrorText(), data ->
+        sendTextMes(bot, user, text, data ->
                 user.setLastMessageId(data.getMessageId()));
     }
 
@@ -35,10 +36,10 @@ public abstract class BaseMessageSender<USER extends AbstractUserData, MESSAGE, 
     public void sendTextMes(
             TelegramClient bot,
             USER user,
-            String text
+            String text,
+            Consumer<MessageSentData> onMessage
     ) {
-        sender.sendMessage(bot, user.getChatId(), text, data ->
-                user.setLastMessageId(data.getMessageId()));
+        sender.sendMessage(bot, user.getChatId(), text, onMessage);
     }
 
     @Override
@@ -67,9 +68,5 @@ public abstract class BaseMessageSender<USER extends AbstractUserData, MESSAGE, 
             Consumer<MessageSentData> onMessage
     ) {
         sender.deleteMes(bot, user.getChatId(), messageId, onMessage);
-    }
-
-    public String getDefaultErrorText() {
-        return "🚫 Server is not available. Try again in a couple of minutes...";
     }
 }

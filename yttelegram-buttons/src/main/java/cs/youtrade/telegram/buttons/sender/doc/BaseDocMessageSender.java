@@ -1,14 +1,12 @@
 package cs.youtrade.telegram.buttons.sender.doc;
 
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
+import cs.youtrade.telegram.buttons.def.MessageProcessor;
 import cs.youtrade.telegram.buttons.sender.BaseMessageSender;
 import cs.youtrade.telegram.buttons.sender.ISenderService;
-import cs.youtrade.telegram.buttons.util.MessageSentData;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-
-import java.util.function.Consumer;
 
 public abstract class BaseDocMessageSender<USER extends AbstractUserData>
         extends BaseMessageSender<USER, SendDocument, EditMessageMedia> {
@@ -19,12 +17,17 @@ public abstract class BaseDocMessageSender<USER extends AbstractUserData>
     }
 
     @Override
-    public void sendEdit(TelegramClient bot, USER user, EditMessageMedia edit, Consumer<MessageSentData> onMessage) {
+    public void sendEdit(
+            TelegramClient bot,
+            USER user,
+            EditMessageMedia edit,
+            MessageProcessor<USER> processor
+    ) {
         long chatId = user.getChatId();
         if (edit == null)
-            sendDefErrMes(bot, user);
+            processor.processError(bot, user);
         else
-            sender.sendMessage(bot, chatId, edit, onMessage);
+            sender.sendMessage(bot, chatId, edit, processor::processMessage);
     }
 
     @Override
@@ -32,12 +35,12 @@ public abstract class BaseDocMessageSender<USER extends AbstractUserData>
             TelegramClient bot,
             USER user,
             SendDocument mes,
-            Consumer<MessageSentData> onMessage
+            MessageProcessor<USER> processor
     ) {
         long chatId = user.getChatId();
         if (mes == null)
-            sendDefErrMes(bot, user);
+            processor.processError(bot, user);
         else
-            sender.sendMessage(bot, chatId, mes, onMessage);
+            sender.sendMessage(bot, chatId, mes, processor::processMessage);
     }
 }

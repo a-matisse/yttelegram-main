@@ -37,7 +37,7 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
     private final Map<Long, Long> lastTimeSentMessages = new HashMap<>();
 
     private final Duration messageDelay;
-    private int maxMessageLength = 4096;
+    private final int maxMessageLength;
 
     public BaseSendMessageService(Duration messageDelay, int maxMessageLength) {
         this.messageDelay = messageDelay != null ? messageDelay : Duration.ofMillis(35);
@@ -54,6 +54,10 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
 
     public BaseSendMessageService(int maxMessageLength) {
         this(Duration.ofMillis(35), maxMessageLength);
+    }
+
+    public BaseSendMessageService() {
+        this(Duration.ofMillis(35), 4096);
     }
 
     @Override

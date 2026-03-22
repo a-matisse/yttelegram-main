@@ -50,7 +50,7 @@ public abstract class AbstractMenuState<
             } catch (Exception e) {
                 log.error("Callback error", e);
                 // fallback message
-                sender.sendTextMes(bot, user, getErrorMessage());
+                sendDefErrMes(bot, user);
                 // returning the error state
                 return errorType(user);
             }
@@ -127,14 +127,6 @@ public abstract class AbstractMenuState<
         return InlineKeyboardMarkup.builder()
                 .keyboard(buildKeyboard(user))
                 .build();
-    }
-
-    public String getErrorMessage() {
-        return """
-                🚫 <b>Сервис недоступен или приложение было обновлено</b>
-                
-                Для синхронизации с текущей версией отправьте любую команду (например /start)
-                """;
     }
 
     public void executeSide(TelegramClient bot, Update update, USER userData) {

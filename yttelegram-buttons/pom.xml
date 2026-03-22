@@ -13,7 +13,7 @@
     <!-- For uploading on Maven Central -->
     <groupId>xyz.youtradecs</groupId>
     <artifactId>yttelegram-buttons</artifactId>
-    <version>1.1.16</version>
+    <version>1.1.19</version>
 
     <licenses>
         <license>
@@ -147,6 +147,16 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <!-- Не падать при ошибках -->
+                    <failOnError>false</failOnError>
+                    <!-- Не падать при предупреждениях -->
+                    <failOnWarnings>false</failOnWarnings>
+                    <!-- Отключить строгую проверку JavaDoc -->
+                    <additionalOptions>
+                        <additionalOption>-Xdoclint:none</additionalOption>
+                    </additionalOptions>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.central</groupId>
