@@ -23,9 +23,9 @@ public abstract class AbstractPreCheckoutState<USER extends AbstractUserData, ST
             return null;
 
         PreCheckoutQuery query = update.getPreCheckoutQuery();
-        boolean ok = preCheckoutCheck(bot, user);
-        if (ok) sendSuccess(bot, user);
-        else sendFailed(bot, user);
+        boolean ok = preCheckoutCheck(bot, update, user);
+        if (ok) sendSuccess(bot, update, user);
+        else sendFailed(bot, update, user);
 
         return AnswerPreCheckoutQuery
                 .builder()
@@ -34,17 +34,17 @@ public abstract class AbstractPreCheckoutState<USER extends AbstractUserData, ST
                 .build();
     }
 
-    public void sendSuccess(TelegramClient bot, USER user) {
-        sender.sendTextMes(bot, user, getSuccessText(bot, user));
+    public void sendSuccess(TelegramClient bot, Update update, USER user) {
+        sender.sendTextMes(bot, user, getSuccessText(bot, update, user));
     }
 
-    public void sendFailed(TelegramClient bot, USER user) {
-        sender.sendTextMes(bot, user, getFailedText(bot, user));
+    public void sendFailed(TelegramClient bot, Update update, USER user) {
+        sender.sendTextMes(bot, user, getFailedText(bot, update, user));
     }
 
-    public abstract String getSuccessText(TelegramClient bot, USER user);
+    public abstract String getSuccessText(TelegramClient bot, Update update, USER user);
 
-    public abstract String getFailedText(TelegramClient bot, USER user);
+    public abstract String getFailedText(TelegramClient bot, Update update, USER user);
 
-    public abstract boolean preCheckoutCheck(TelegramClient bot, USER user);
+    public abstract boolean preCheckoutCheck(TelegramClient bot, Update update, USER user);
 }
