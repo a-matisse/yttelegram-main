@@ -94,6 +94,7 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
                 case EDIT_MEDIA -> new MessageSentData(bot.execute(messageInfo.getEditMedia()));
                 case EDIT_MARKUP -> new MessageSentData(bot.execute(messageInfo.getEditMarkup()));
                 case ANSWER_CALLBACK -> new MessageSentData(bot.execute(messageInfo.getAck()));
+                case ANSWER_PRE_CHECKOUT -> new MessageSentData(bot.execute(messageInfo.getApcq()));
                 case DELETE -> new MessageSentData(bot.execute(messageInfo.getDelete()));
                 case INVOICE -> new MessageSentData(bot.execute(messageInfo.getInvoice()));
             };

@@ -2,6 +2,7 @@ package cs.youtrade.telegram.buttons.sender;
 
 import cs.youtrade.telegram.buttons.util.MessageSentData;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,7 +11,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMe
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Document;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.io.InputStream;
@@ -94,6 +94,13 @@ public interface ISenderService {
             TelegramClient bot,
             Long chatId,
             AnswerCallbackQuery ack,
+            Consumer<MessageSentData> onMessage
+    );
+
+    void sendMessage(
+            TelegramClient bot,
+            Long chatId,
+            AnswerPreCheckoutQuery apcq,
             Consumer<MessageSentData> onMessage
     );
 }

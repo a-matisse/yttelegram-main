@@ -23,7 +23,7 @@ public interface DefStateInt<USER extends AbstractUserData, STATE extends Enum<S
     /**
      * Message creation method
      */
-    MESSAGE buildMessage(TelegramClient bot, USER e);
+    MESSAGE buildMessage(TelegramClient bot, Update update, USER e);
 
     /**
      * Message edit creation method

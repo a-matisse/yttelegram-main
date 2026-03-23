@@ -44,7 +44,7 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
     }
 
     private void sendNewMessage(TelegramClient bot, Update update, USER user) {
-        MESSAGE mes = buildMessage(bot, user);
+        MESSAGE mes = buildMessage(bot, update, user);
         if (mes != null) {
             // And sending the new message
             sender.sendMessage(bot, user, mes, getDefaultMessageProcessor(bot, update, user));

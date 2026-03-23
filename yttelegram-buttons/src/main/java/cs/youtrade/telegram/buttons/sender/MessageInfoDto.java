@@ -3,6 +3,7 @@ package cs.youtrade.telegram.buttons.sender;
 import cs.youtrade.telegram.buttons.util.MessageSentData;
 import lombok.Data;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -32,6 +33,7 @@ public class MessageInfoDto {
     private EditMessageReplyMarkup editMarkup;
     // Other types
     private AnswerCallbackQuery ack;
+    private AnswerPreCheckoutQuery apcq;
     private DeleteMessage delete;
 
     public MessageInfoDto(
@@ -136,6 +138,19 @@ public class MessageInfoDto {
         this.chatId = chatId;
         this.onMessage = onMessage;
         this.messageType = MessageType.ANSWER_CALLBACK;
+    }
+
+    public MessageInfoDto(
+            TelegramClient bot,
+            AnswerPreCheckoutQuery apcq,
+            long chatId,
+            Consumer<MessageSentData> onMessage
+    ) {
+        this.bot = bot;
+        this.apcq = apcq;
+        this.chatId = chatId;
+        this.onMessage = onMessage;
+        this.messageType = MessageType.ANSWER_PRE_CHECKOUT;
     }
 
     public MessageInfoDto(

@@ -4,7 +4,6 @@ import cs.youtrade.telegram.buttons.IMenuEnum;
 import cs.youtrade.telegram.buttons.TelegramFileDownloader;
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.menu.AbstractMenuState;
-import cs.youtrade.telegram.buttons.sender.IMessageSender;
 import cs.youtrade.telegram.buttons.sender.doc.BaseDocMessageSender;
 import cs.youtrade.telegram.buttons.util.NoContentException;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
@@ -12,8 +11,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaDocument;
-import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -29,7 +28,7 @@ public abstract class AbstractDocMenuState<C, USER extends AbstractUserData, STA
     }
 
     @Override
-    public SendDocument buildMessage(TelegramClient bot, USER user) {
+    public SendDocument buildMessage(TelegramClient bot, Update update, USER user) {
         C content = getContent(user);
         if (content == null)
             return null;

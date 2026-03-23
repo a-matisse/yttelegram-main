@@ -9,5 +9,6 @@ public enum MessageType {
     EDIT_MEDIA,
     EDIT_MARKUP,
     ANSWER_CALLBACK,
+    ANSWER_PRE_CHECKOUT,
     DELETE
 }

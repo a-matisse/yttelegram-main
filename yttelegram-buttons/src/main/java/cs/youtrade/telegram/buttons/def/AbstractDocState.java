@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public abstract class AbstractDocState<C, USER extends AbstractUserData, STATE extends Enum<STATE>>
@@ -17,7 +18,7 @@ public abstract class AbstractDocState<C, USER extends AbstractUserData, STATE e
     }
 
     @Override
-    public SendDocument buildMessage(TelegramClient bot, USER user) {
+    public SendDocument buildMessage(TelegramClient bot, Update update, USER user) {
         C content = getContent(user);
         if (content == null)
             return null;

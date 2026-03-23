@@ -5,6 +5,7 @@ import cs.youtrade.telegram.buttons.sender.IMessageSender;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public abstract class AbstractTextState<USER extends AbstractUserData, STATE extends Enum<STATE>>
@@ -16,7 +17,7 @@ public abstract class AbstractTextState<USER extends AbstractUserData, STATE ext
     }
 
     @Override
-    public SendMessage buildMessage(TelegramClient bot, USER e) {
+    public SendMessage buildMessage(TelegramClient bot, Update update, USER e) {
         return SendMessage
                 .builder()
                 .chatId(e.getChatId())

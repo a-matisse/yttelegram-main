@@ -7,6 +7,7 @@ import cs.youtrade.telegram.buttons.sender.text.BaseTextMessageSender;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_TYPE extends IMenuEnum, STATE extends Enum<STATE>>
@@ -17,7 +18,7 @@ public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_
         super(sender);
     }
 
-    public SendMessage buildMessage(TelegramClient bot, USER user) {
+    public SendMessage buildMessage(TelegramClient bot, Update update, USER user) {
         String ans = "";
         try {
             String header = getHeaderText(bot, user);

@@ -6,6 +6,7 @@ import cs.youtrade.telegram.buttons.sender.invoice.BaseInvoiceMessageSender;
 import cs.youtrade.telegram.buttons.sender.invoice.InvoicePriceData;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -19,9 +20,8 @@ public abstract class AbstractInvoiceState<USER extends AbstractUserData, STATE 
         super(sender);
     }
 
-
     @Override
-    public SendInvoice buildMessage(TelegramClient bot, USER e) {
+    public SendInvoice buildMessage(TelegramClient bot, Update update, USER e) {
         // Getting the prices for builder
         var labeledPrices = getInvoicePrices(bot, e)
                 .stream()
