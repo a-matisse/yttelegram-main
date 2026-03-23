@@ -4,6 +4,7 @@ import cs.youtrade.telegram.buttons.TelegramFileDownloader;
 import cs.youtrade.telegram.buttons.util.MessageSentData;
 import lombok.extern.log4j.Log4j2;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
@@ -207,5 +208,10 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
     @Override
     public void sendMessage(TelegramClient bot, Long chatId, AnswerCallbackQuery ack, Consumer<MessageSentData> onMessage) {
         messageQueue.add(new MessageInfoDto(bot, ack, chatId, onMessage));
+    }
+
+    @Override
+    public void sendMessage(TelegramClient bot, Long chatId, AnswerPreCheckoutQuery apcq, Consumer<MessageSentData> onMessage) {
+        messageQueue.add(new MessageInfoDto(bot, apcq, chatId, onMessage));
     }
 }
