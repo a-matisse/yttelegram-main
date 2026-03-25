@@ -21,4 +21,8 @@ public interface MenuStateInt<USER extends AbstractUserData, MENU_TYPE extends I
     STATE executeCallback(TelegramClient bot, Update update, USER user, MENU_TYPE t);
 
     String getHeaderText(TelegramClient bot, USER user);
+
+    default boolean replyAfterExecution() {
+        return false;
+    }
 }

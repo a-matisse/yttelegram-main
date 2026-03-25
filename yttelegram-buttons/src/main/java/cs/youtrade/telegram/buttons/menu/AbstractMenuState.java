@@ -41,12 +41,16 @@ public abstract class AbstractMenuState<
         if (update.hasCallbackQuery()) {
             String callbackQuery = update.getCallbackQuery().getData();
             try {
-                // Replies so the button will not be highlighted
-                sender.replyCallback(bot, user, update, null);
+                // Replies so the button will not be highlighted (if should be so before execution)
+                if (!replyAfterExecution()) sender.replyCallback(bot, user, update, null);
                 // Gets the next menu
                 MENU menuType = getOption(callbackQuery, user);
                 // Executes the callback
-                return executeCallback(bot, update, user, menuType);
+                var newState = executeCallback(bot, update, user, menuType);
+                // Replies so the button will not be highlighted (if should be so after execution)
+                if (replyAfterExecution()) sender.replyCallback(bot, user, update, null);
+                // Returning the new state
+                return newState;
             } catch (Exception e) {
                 log.error("Callback error", e);
                 // fallback message
