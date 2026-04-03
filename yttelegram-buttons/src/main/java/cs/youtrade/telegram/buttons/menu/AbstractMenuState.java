@@ -113,6 +113,10 @@ public abstract class AbstractMenuState<
             builder.url(url);
         else
             builder.callbackData(menuOption.getOptionName());
+        // Setting the button style for button if needed
+        var buttonStyle = getButtonStyle(user).get(menuOption);
+        if (buttonStyle != null)
+            builder.style(buttonStyle.apply(user).getStyle());
         // Building the button
         return builder
                 .pay(menuOption.isPay())
@@ -145,6 +149,10 @@ public abstract class AbstractMenuState<
     }
 
     public Map<MENU, Function<USER, String>> getTextFunctions(USER user) {
+        return Map.of();
+    }
+
+    public Map<MENU, Function<USER, InlineKeyboardButtonStyle>> getButtonStyle(USER user) {
         return Map.of();
     }
 }
