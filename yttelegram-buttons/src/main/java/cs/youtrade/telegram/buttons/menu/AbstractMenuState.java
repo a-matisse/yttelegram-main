@@ -115,8 +115,11 @@ public abstract class AbstractMenuState<
             builder.callbackData(menuOption.getOptionName());
         // Setting the button style for button if needed
         var buttonStyle = getButtonStyle(user).get(menuOption);
-        if (buttonStyle != null)
-            builder.style(buttonStyle.apply(user).getStyle());
+        if (buttonStyle != null) {
+            var style = buttonStyle.apply(user);
+            if (style != null && style != InlineKeyboardButtonStyle.DEFAULT)
+                builder.style(buttonStyle.apply(user).getStyle());
+        }
         // Building the button
         return builder
                 .pay(menuOption.isPay())

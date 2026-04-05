@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum InlineKeyboardButtonStyle {
     DANGER("danger"),
     SUCCESS("success"),
-    PRIMARY("primary");
+    PRIMARY("primary"),
+    DEFAULT("");
 
     private final String style;
 }
