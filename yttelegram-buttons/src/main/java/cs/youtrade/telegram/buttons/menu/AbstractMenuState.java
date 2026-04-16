@@ -58,8 +58,12 @@ public abstract class AbstractMenuState<
                 // returning the error state
                 return errorType(user);
             }
+        } else {
+            return onNoCallback(bot, update, user);
         }
+    }
 
+    public STATE onNoCallback(TelegramClient bot, Update update, USER user) {
         return supportedState();
     }
 
