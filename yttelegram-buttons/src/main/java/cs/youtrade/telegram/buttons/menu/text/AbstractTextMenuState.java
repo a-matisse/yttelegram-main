@@ -58,6 +58,7 @@ public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_
                 .text(ans)
                 .replyMarkup(buildMarkup(user))
                 .parseMode(ParseMode.HTML)
+                .disableWebPagePreview(disableWebPagePreview())
                 .build();
     }
 
