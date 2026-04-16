@@ -35,6 +35,7 @@ public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_
                 .text(ans)
                 .replyMarkup(buildMarkup(user))
                 .parseMode(ParseMode.HTML)
+                .disableWebPagePreview(disableWebPagePreview())
                 .build();
     }
 
@@ -63,5 +64,9 @@ public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_
     @Override
     public Class<EditMessageText> supportedEdit() {
         return EditMessageText.class;
+    }
+
+    public boolean disableWebPagePreview() {
+        return true;
     }
 }
