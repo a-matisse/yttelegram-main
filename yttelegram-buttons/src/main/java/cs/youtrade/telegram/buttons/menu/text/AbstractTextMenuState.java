@@ -1,6 +1,7 @@
 package cs.youtrade.telegram.buttons.menu.text;
 
 import cs.youtrade.telegram.buttons.IMenuEnum;
+import cs.youtrade.telegram.buttons.WebPagePreviewable;
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.menu.AbstractMenuState;
 import cs.youtrade.telegram.buttons.sender.text.BaseTextMessageSender;
@@ -11,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_TYPE extends IMenuEnum, STATE extends Enum<STATE>>
-        extends AbstractMenuState<USER, MENU_TYPE, STATE, SendMessage, EditMessageText> {
+        extends AbstractMenuState<USER, MENU_TYPE, STATE, SendMessage, EditMessageText> implements WebPagePreviewable {
     public AbstractTextMenuState(
             BaseTextMessageSender<USER> sender
     ) {
@@ -65,9 +66,5 @@ public abstract class AbstractTextMenuState<USER extends AbstractUserData, MENU_
     @Override
     public Class<EditMessageText> supportedEdit() {
         return EditMessageText.class;
-    }
-
-    public boolean disableWebPagePreview() {
-        return true;
     }
 }
