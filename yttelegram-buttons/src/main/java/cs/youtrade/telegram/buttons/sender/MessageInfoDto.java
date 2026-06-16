@@ -45,7 +45,7 @@ public class MessageInfoDto {
             Supplier<SendMessage> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        return new MessageInfoDto(bot, chatId, MessageType.PHOTO, supplier, onMessage);
+        return new MessageInfoDto(bot, chatId, MessageType.TEXT, supplier, onMessage);
     }
 
     public static MessageInfoDto doc(
@@ -63,7 +63,7 @@ public class MessageInfoDto {
             Supplier<SendPhoto> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        return new MessageInfoDto(bot, chatId, MessageType.DOCUMENT, supplier, onMessage);
+        return new MessageInfoDto(bot, chatId, MessageType.PHOTO, supplier, onMessage);
     }
 
     public static MessageInfoDto invoice(
