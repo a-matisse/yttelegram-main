@@ -67,8 +67,6 @@ public class BaseSendMessageService implements ISenderService, Runnable, AutoClo
         try {
             // Getting the message from queue
             MessageInfoDto messageInfo = messageQueue.take();
-            if (messageInfo.getMessage() == null)
-                throw new TelegramMessageEmptyException("Message is empty");
             chatId = messageInfo.getChatId();
             long lastTime = lastTimeSentMessages.getOrDefault(chatId, 0L);
             // Checking the message send interval
@@ -166,54 +164,61 @@ public class BaseSendMessageService implements ISenderService, Runnable, AutoClo
 
     // --- Inner send methods
     private MessageSentData sendText(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        SendMessage mes = info.getMessage();
+        SendMessage mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
     }
 
     private MessageSentData sendDoc(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        SendDocument mes = info.getMessage();
+        SendDocument mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
     }
 
     private MessageSentData sendPhoto(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        SendPhoto mes = info.getMessage();
+        SendPhoto mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
     }
 
     private MessageSentData sendInvoice(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        SendInvoice mes = info.getMessage();
+        SendInvoice mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
     }
 
     private MessageSentData sendEditText(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        EditMessageText mes = info.getMessage();
+        EditMessageText mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
     }
 
     private MessageSentData sendEditMedia(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        EditMessageMedia mes = info.getMessage();
+        EditMessageMedia mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
     }
 
 
     private MessageSentData sendEditMarkup(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        EditMessageReplyMarkup mes = info.getMessage();
+        EditMessageReplyMarkup mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
     }
 
     private MessageSentData sendAck(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        AnswerCallbackQuery mes = info.getMessage();
+        AnswerCallbackQuery mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
     }
 
     private MessageSentData sendApcq(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        AnswerPreCheckoutQuery mes = info.getMessage();
+        AnswerPreCheckoutQuery mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
     }
 
     private MessageSentData sendDelete(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
-        DeleteMessage mes = info.getMessage();
+        DeleteMessage mes = getMessage(info);
         return new MessageSentData(bot.execute(mes));
+    }
+
+    private <T> T getMessage(MessageInfoDto messageInfo) {
+        T message = messageInfo.getMessage();
+        if (message == null)
+            throw new TelegramMessageEmptyException("Message is empty");
+        return message;
     }
 
     // --- Assistive methods
