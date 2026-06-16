@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Data
 public class MessageInfoDto {
@@ -22,147 +23,114 @@ public class MessageInfoDto {
     private final TelegramClient bot;
     private final long chatId;
     private final Consumer<MessageSentData> onMessage;
-    // Send types
-    private SendMessage message;
-    private SendPhoto photo;
-    private SendDocument doc;
-    private SendInvoice invoice;
-    // Edit types
-    private EditMessageMedia editMedia;
-    private EditMessageText editText;
-    private EditMessageReplyMarkup editMarkup;
-    // Other types
-    private AnswerCallbackQuery ack;
-    private AnswerPreCheckoutQuery apcq;
-    private DeleteMessage delete;
+    private final Supplier<?> messageSupplier;
 
-    public MessageInfoDto(
+    private MessageInfoDto(
             TelegramClient bot,
-            SendMessage message,
             long chatId,
+            MessageType messageType,
+            Supplier<?> messageSupplier,
             Consumer<MessageSentData> onMessage
     ) {
         this.bot = bot;
-        this.message = message;
         this.chatId = chatId;
+        this.messageType = messageType;
+        this.messageSupplier = messageSupplier;
         this.onMessage = onMessage;
-        this.messageType = MessageType.TEXT;
     }
 
-    public MessageInfoDto(
+    public static MessageInfoDto text(
             TelegramClient bot,
-            SendPhoto photo,
             long chatId,
+            Supplier<SendMessage> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        this.bot = bot;
-        this.photo = photo;
-        this.chatId = chatId;
-        this.onMessage = onMessage;
-        this.messageType = MessageType.PHOTO;
+        return new MessageInfoDto(bot, chatId, MessageType.PHOTO, supplier, onMessage);
     }
 
-    public MessageInfoDto(
+    public static MessageInfoDto doc(
             TelegramClient bot,
-            SendDocument doc,
             long chatId,
+            Supplier<SendDocument> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        this.bot = bot;
-        this.doc = doc;
-        this.chatId = chatId;
-        this.onMessage = onMessage;
-        this.messageType = MessageType.DOCUMENT;
+        return new MessageInfoDto(bot, chatId, MessageType.DOCUMENT, supplier, onMessage);
     }
 
-    public MessageInfoDto(
+    public static MessageInfoDto photo(
             TelegramClient bot,
-            SendInvoice invoice,
             long chatId,
+            Supplier<SendPhoto> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        this.bot = bot;
-        this.invoice = invoice;
-        this.chatId = chatId;
-        this.onMessage = onMessage;
-        this.messageType = MessageType.INVOICE;
+        return new MessageInfoDto(bot, chatId, MessageType.DOCUMENT, supplier, onMessage);
     }
 
-    public MessageInfoDto(
+    public static MessageInfoDto invoice(
             TelegramClient bot,
-            EditMessageText edit,
             long chatId,
+            Supplier<SendInvoice> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        this.bot = bot;
-        this.editText = edit;
-        this.chatId = chatId;
-        this.onMessage = onMessage;
-        this.messageType = MessageType.EDIT_TEXT;
+        return new MessageInfoDto(bot, chatId, MessageType.INVOICE, supplier, onMessage);
     }
 
-    public MessageInfoDto(
+    public static MessageInfoDto editText(
             TelegramClient bot,
-            EditMessageMedia edit,
             long chatId,
+            Supplier<EditMessageText> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        this.bot = bot;
-        this.editMedia = edit;
-        this.chatId = chatId;
-        this.onMessage = onMessage;
-        this.messageType = MessageType.EDIT_MEDIA;
+        return new MessageInfoDto(bot, chatId, MessageType.EDIT_TEXT, supplier, onMessage);
     }
 
-    public MessageInfoDto(
+    public static MessageInfoDto editMedia(
             TelegramClient bot,
-            EditMessageReplyMarkup edit,
             long chatId,
+            Supplier<EditMessageMedia> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        this.bot = bot;
-        this.editMarkup = edit;
-        this.chatId = chatId;
-        this.onMessage = onMessage;
-        this.messageType = MessageType.EDIT_MARKUP;
+        return new MessageInfoDto(bot, chatId, MessageType.EDIT_MEDIA, supplier, onMessage);
     }
 
-    public MessageInfoDto(
+    public static MessageInfoDto editMarkup(
             TelegramClient bot,
-            AnswerCallbackQuery ack,
             long chatId,
+            Supplier<EditMessageReplyMarkup> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        this.bot = bot;
-        this.ack = ack;
-        this.chatId = chatId;
-        this.onMessage = onMessage;
-        this.messageType = MessageType.ANSWER_CALLBACK;
+        return new MessageInfoDto(bot, chatId, MessageType.EDIT_MARKUP, supplier, onMessage);
     }
 
-    public MessageInfoDto(
+    public static MessageInfoDto ack(
             TelegramClient bot,
-            AnswerPreCheckoutQuery apcq,
             long chatId,
+            Supplier<AnswerCallbackQuery> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        this.bot = bot;
-        this.apcq = apcq;
-        this.chatId = chatId;
-        this.onMessage = onMessage;
-        this.messageType = MessageType.ANSWER_PRE_CHECKOUT;
+        return new MessageInfoDto(bot, chatId, MessageType.ANSWER_CALLBACK, supplier, onMessage);
     }
 
-    public MessageInfoDto(
+    public static MessageInfoDto apcq(
             TelegramClient bot,
-            DeleteMessage delete,
             long chatId,
+            Supplier<AnswerPreCheckoutQuery> supplier,
             Consumer<MessageSentData> onMessage
     ) {
-        this.bot = bot;
-        this.delete = delete;
-        this.chatId = chatId;
-        this.onMessage = onMessage;
-        this.messageType = MessageType.DELETE;
+        return new MessageInfoDto(bot, chatId, MessageType.ANSWER_PRE_CHECKOUT, supplier, onMessage);
+    }
+
+    public static MessageInfoDto delete(
+            TelegramClient bot,
+            long chatId,
+            Supplier<DeleteMessage> supplier,
+            Consumer<MessageSentData> onMessage
+    ) {
+        return new MessageInfoDto(bot, chatId, MessageType.DELETE, supplier, onMessage);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getMessage() {
+        return (T) messageSupplier.get();
     }
 }

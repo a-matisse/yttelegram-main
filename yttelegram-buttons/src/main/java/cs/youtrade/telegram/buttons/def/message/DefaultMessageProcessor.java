@@ -32,7 +32,8 @@ public class DefaultMessageProcessor<USER extends AbstractUserData, EDIT> extend
         }
         if (prevMessageId > 0) {
             try {
-                sender.deleteMes(bot, user, prevMessageId, null);
+                int toDeleteId = prevMessageId;
+                sender.deleteMes(bot, user, () -> toDeleteId, null);
             } catch (Exception e) {
                 log.error("Menu deletion aborted: {}", e.getMessage());
             }

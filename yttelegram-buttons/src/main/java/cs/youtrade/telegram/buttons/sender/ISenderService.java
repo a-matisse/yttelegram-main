@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.io.InputStream;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public interface ISenderService {
     InputStream downloadFile(
@@ -30,7 +31,7 @@ public interface ISenderService {
     void deleteMes(
             TelegramClient bot,
             Long chatId,
-            int messageId,
+            Supplier<Integer> messageId,
             Consumer<MessageSentData> onMessage
     );
 
@@ -42,65 +43,6 @@ public interface ISenderService {
     );
 
     void sendMessage(
-            TelegramClient bot,
-            Long chatId,
-            SendMessage message,
-            Consumer<MessageSentData> onMessage
-    );
-
-    void sendMessage(
-            TelegramClient bot,
-            Long chatId,
-            SendDocument doc,
-            Consumer<MessageSentData> onMessage
-    );
-
-    void sendMessage(
-            TelegramClient bot,
-            Long chatId,
-            SendPhoto sendPhoto,
-            Consumer<MessageSentData> onMessage
-    );
-
-    void sendMessage(
-            TelegramClient bot,
-            Long chatId,
-            SendInvoice invoice,
-            Consumer<MessageSentData> onMessage
-    );
-
-    void sendMessage(
-            TelegramClient bot,
-            Long chatId,
-            EditMessageText edit,
-            Consumer<MessageSentData> onMessage
-    );
-
-    void sendMessage(
-            TelegramClient bot,
-            Long chatId,
-            EditMessageMedia edit,
-            Consumer<MessageSentData> onMessage
-    );
-
-    void sendMessage(
-            TelegramClient bot,
-            Long chatId,
-            EditMessageReplyMarkup edit,
-            Consumer<MessageSentData> onMessage
-    );
-
-    void sendMessage(
-            TelegramClient bot,
-            Long chatId,
-            AnswerCallbackQuery ack,
-            Consumer<MessageSentData> onMessage
-    );
-
-    void sendMessage(
-            TelegramClient bot,
-            Long chatId,
-            AnswerPreCheckoutQuery apcq,
-            Consumer<MessageSentData> onMessage
+            MessageInfoDto messageInfo
     );
 }

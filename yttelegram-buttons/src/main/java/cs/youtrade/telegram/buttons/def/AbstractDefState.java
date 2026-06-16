@@ -9,6 +9,8 @@ import lombok.extern.log4j.Log4j2;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.util.function.Supplier;
+
 @Log4j2
 @RequiredArgsConstructor
 public abstract class AbstractDefState<USER extends AbstractUserData, STATE extends Enum<STATE>, MESSAGE, EDIT>
@@ -33,23 +35,18 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
             && supportedEdit.equals(mesSupportedEdit)
             && lastMessageId > 0
         ) {
-            EDIT edit = buildEdit(bot, user);
-            if (edit != null) {
-                sender.sendEdit(bot, user, edit, getDefaultOnErrorProcessor());
-                return;
-            }
+            Supplier<EDIT> editSupplier = () -> buildEdit(bot, user);
+            sender.sendEdit(bot, user, editSupplier, getDefaultOnErrorProcessor());
+            return;
         }
         sendNewMessage(bot, update, user);
     }
 
     private void sendNewMessage(TelegramClient bot, Update update, USER user) {
-        MESSAGE mes = buildMessage(bot, update, user);
-        if (mes != null) {
-            // And sending the new message
-            sender.sendMessage(bot, user, mes, getDefaultMessageProcessor(bot, update, user));
-        } else {
-            sendDefErrMes(bot, user);
-        }
+        // Preparing the message
+        Supplier<MESSAGE> messageSupplier = () -> buildMessage(bot, update, user);
+        // And sending it
+        sender.sendMessage(bot, user, messageSupplier, getDefaultMessageProcessor(bot, update, user));
     }
 
     public DefaultMessageProcessor<USER, EDIT> getDefaultMessageProcessor(

@@ -2,6 +2,9 @@ package cs.youtrade.telegram.buttons.sender;
 
 import cs.youtrade.telegram.buttons.TelegramFileDownloader;
 import cs.youtrade.telegram.buttons.util.MessageSentData;
+import cs.youtrade.telegram.buttons.util.TelegramMessageEmptyException;
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
@@ -21,7 +24,6 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
-import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -29,37 +31,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Log4j2
+@SuperBuilder
 public abstract class BaseSendMessageService implements ISenderService, Runnable {
-    protected static final BlockingQueue<MessageInfoDto> messageQueue = new LinkedBlockingQueue<>();
-
+    @Builder.Default
+    private final BlockingQueue<MessageInfoDto> messageQueue = new LinkedBlockingQueue<>();
+    @Builder.Default
     private final ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+    @Builder.Default
     private final Map<Long, Long> lastTimeSentMessages = new HashMap<>();
-
-    private final Duration messageDelay;
-    private final int maxMessageLength;
-
-    public BaseSendMessageService(Duration messageDelay, int maxMessageLength) {
-        this.messageDelay = messageDelay != null ? messageDelay : Duration.ofMillis(35);
-        this.maxMessageLength = maxMessageLength;
-    }
-
-    public BaseSendMessageService(long messageDelayMillis, int maxMessageLength) {
-        this(Duration.ofMillis(messageDelayMillis), maxMessageLength);
-    }
-
-    public BaseSendMessageService(long messagePeriod, TemporalUnit temporalUnit, int maxMessageLength) {
-        this(Duration.of(messagePeriod, temporalUnit), maxMessageLength);
-    }
-
-    public BaseSendMessageService(int maxMessageLength) {
-        this(Duration.ofMillis(35), maxMessageLength);
-    }
-
-    public BaseSendMessageService() {
-        this(Duration.ofMillis(35), 4096);
-    }
+    @Builder.Default
+    private final Duration messageDelay = Duration.ofMillis(35);
+    @Builder.Default
+    private final int maxMessageLength = 4096;
 
     @Override
     public void run() {
@@ -73,10 +59,11 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
     private void sendMessageFromQueue() {
         long chatId = -1;
         long now = System.currentTimeMillis();
-
         try {
             // Getting the message from queue
             MessageInfoDto messageInfo = messageQueue.take();
+            if (messageInfo.getMessage() == null)
+                throw new TelegramMessageEmptyException("Message is empty");
             chatId = messageInfo.getChatId();
             long lastTime = lastTimeSentMessages.getOrDefault(chatId, 0L);
             // Checking the message send interval
@@ -86,18 +73,17 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
             }
             // Executing the message
             TelegramClient bot = messageInfo.getBot();
-
             MessageSentData data = switch (messageInfo.getMessageType()) {
-                case TEXT -> new MessageSentData(bot.execute(messageInfo.getMessage()));
-                case DOCUMENT -> new MessageSentData(bot.execute(messageInfo.getDoc()));
-                case PHOTO -> new MessageSentData(bot.execute(messageInfo.getPhoto()));
-                case EDIT_TEXT -> new MessageSentData(bot.execute(messageInfo.getEditText()));
-                case EDIT_MEDIA -> new MessageSentData(bot.execute(messageInfo.getEditMedia()));
-                case EDIT_MARKUP -> new MessageSentData(bot.execute(messageInfo.getEditMarkup()));
-                case ANSWER_CALLBACK -> new MessageSentData(bot.execute(messageInfo.getAck()));
-                case ANSWER_PRE_CHECKOUT -> new MessageSentData(bot.execute(messageInfo.getApcq()));
-                case DELETE -> new MessageSentData(bot.execute(messageInfo.getDelete()));
-                case INVOICE -> new MessageSentData(bot.execute(messageInfo.getInvoice()));
+                case TEXT -> sendText(bot, messageInfo);
+                case DOCUMENT -> sendDoc(bot, messageInfo);
+                case PHOTO -> sendPhoto(bot, messageInfo);
+                case EDIT_TEXT -> sendEditText(bot, messageInfo);
+                case EDIT_MEDIA -> sendEditMedia(bot, messageInfo);
+                case EDIT_MARKUP -> sendEditMarkup(bot, messageInfo);
+                case ANSWER_CALLBACK -> sendAck(bot, messageInfo);
+                case ANSWER_PRE_CHECKOUT -> sendApcq(bot, messageInfo);
+                case DELETE -> sendDelete(bot, messageInfo);
+                case INVOICE -> sendInvoice(bot, messageInfo);
             };
             // Consuming if accessible and not null
             var onMessage = messageInfo.getOnMessage();
@@ -116,6 +102,8 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
         } catch (TelegramApiException e) {
             if (chatId != -1002332618563L)
                 log.error("Ошибка при отправке сообщения по id={}: {}", chatId, e.getMessage(), e);
+        } catch (TelegramMessageEmptyException e) {
+            log.error(e);
         }
     }
 
@@ -141,77 +129,99 @@ public abstract class BaseSendMessageService implements ISenderService, Runnable
     }
 
     @Override
-    public void deleteMes(TelegramClient bot, Long chatId, int messageId, Consumer<MessageSentData> onMessage) {
-        DeleteMessage delete = DeleteMessage
-                .builder()
-                .chatId(chatId)
-                .messageId(messageId)
-                .build();
-        messageQueue.add(new MessageInfoDto(bot, delete, chatId, onMessage));
+    public void deleteMes(TelegramClient bot, Long chatId, Supplier<Integer> messageIdSupplier, Consumer<MessageSentData> onMessage) {
+        // Creating the supplier
+        Supplier<DeleteMessage> deleteSupplier = () -> generateDeleteMessage(chatId, messageIdSupplier.get());
+        // Queueing the message
+        messageQueue.add(MessageInfoDto.delete(bot, chatId, deleteSupplier, onMessage));
     }
 
     @Override
     public void sendMessage(TelegramClient bot, Long chatId, String text, Consumer<MessageSentData> onMessage) {
         SendMessage message;
         int startIndex = 0;
-
         do {
             int endIndex = Math.min(startIndex + maxMessageLength, text.length());
             String chunk = text.substring(startIndex, endIndex);
-            message = SendMessage
-                    .builder()
-                    .chatId(chatId)
-                    .text(chunk)
-                    .parseMode(ParseMode.HTML)
-                    .build();
-
-            messageQueue.add(new MessageInfoDto(bot, message, chatId, onMessage));
+            // Creating the supplier
+            Supplier<SendMessage> messageSupplier = () -> generateTextMessage(chatId, chunk);
+            // Queueing the message
+            messageQueue.add(MessageInfoDto.text(bot, chatId, messageSupplier, onMessage));
             startIndex = endIndex;
         } while (startIndex < text.length());
     }
 
-    @Override
-    public void sendMessage(TelegramClient bot, Long chatId, SendMessage message, Consumer<MessageSentData> onMessage) {
-        messageQueue.add(new MessageInfoDto(bot, message, chatId, onMessage));
+    public void sendMessage(MessageInfoDto messageInfo) {
+        messageQueue.add(messageInfo);
     }
 
-    @Override
-    public void sendMessage(TelegramClient bot, Long chatId, SendDocument doc, Consumer<MessageSentData> onMessage) {
-        messageQueue.add(new MessageInfoDto(bot, doc, chatId, onMessage));
+    // --- Inner send methods
+    private MessageSentData sendText(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        SendMessage mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
     }
 
-    @Override
-    public void sendMessage(TelegramClient bot, Long chatId, SendPhoto sendPhoto, Consumer<MessageSentData> onMessage) {
-        messageQueue.add(new MessageInfoDto(bot, sendPhoto, chatId, onMessage));
+    private MessageSentData sendDoc(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        SendDocument mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
     }
 
-    @Override
-    public void sendMessage(TelegramClient bot, Long chatId, SendInvoice invoice, Consumer<MessageSentData> onMessage) {
-        messageQueue.add(new MessageInfoDto(bot, invoice, chatId, onMessage));
+    private MessageSentData sendPhoto(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        SendPhoto mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
     }
 
-    @Override
-    public void sendMessage(TelegramClient bot, Long chatId, EditMessageText edit, Consumer<MessageSentData> onMessage) {
-        messageQueue.add(new MessageInfoDto(bot, edit, chatId, onMessage));
+    private MessageSentData sendInvoice(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        SendInvoice mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
     }
 
-    @Override
-    public void sendMessage(TelegramClient bot, Long chatId, EditMessageMedia edit, Consumer<MessageSentData> onMessage) {
-        messageQueue.add(new MessageInfoDto(bot, edit, chatId, onMessage));
+    private MessageSentData sendEditText(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        EditMessageText mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
     }
 
-    @Override
-    public void sendMessage(TelegramClient bot, Long chatId, EditMessageReplyMarkup edit, Consumer<MessageSentData> onMessage) {
-        messageQueue.add(new MessageInfoDto(bot, edit, chatId, onMessage));
+    private MessageSentData sendEditMedia(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        EditMessageMedia mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
     }
 
-    @Override
-    public void sendMessage(TelegramClient bot, Long chatId, AnswerCallbackQuery ack, Consumer<MessageSentData> onMessage) {
-        messageQueue.add(new MessageInfoDto(bot, ack, chatId, onMessage));
+
+    private MessageSentData sendEditMarkup(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        EditMessageReplyMarkup mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
     }
 
-    @Override
-    public void sendMessage(TelegramClient bot, Long chatId, AnswerPreCheckoutQuery apcq, Consumer<MessageSentData> onMessage) {
-        messageQueue.add(new MessageInfoDto(bot, apcq, chatId, onMessage));
+    private MessageSentData sendAck(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        AnswerCallbackQuery mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
+    }
+
+    private MessageSentData sendApcq(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        AnswerPreCheckoutQuery mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
+    }
+
+    private MessageSentData sendDelete(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
+        DeleteMessage mes = info.getMessage();
+        return new MessageSentData(bot.execute(mes));
+    }
+
+    // --- Assistive methods
+    private SendMessage generateTextMessage(long chatId, String chunk) {
+        return SendMessage
+                .builder()
+                .chatId(chatId)
+                .text(chunk)
+                .parseMode(ParseMode.HTML)
+                .build();
+    }
+
+    private DeleteMessage generateDeleteMessage(long chatId, int messageId) {
+        return DeleteMessage
+                .builder()
+                .chatId(chatId)
+                .messageId(messageId)
+                .build();
     }
 }

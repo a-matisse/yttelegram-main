@@ -4,41 +4,27 @@ import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.def.message.MessageProcessor;
 import cs.youtrade.telegram.buttons.sender.BaseMessageSender;
 import cs.youtrade.telegram.buttons.sender.ISenderService;
+import cs.youtrade.telegram.buttons.sender.MessageInfoDto;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.util.function.Supplier;
+
 public abstract class BasePreCheckoutSender<USER extends AbstractUserData>
         extends BaseMessageSender<USER, AnswerPreCheckoutQuery, EditMessageText> {
+
     public BasePreCheckoutSender(ISenderService sender) {
         super(sender);
     }
 
     @Override
-    public void sendEdit(
-            TelegramClient bot,
-            USER user,
-            EditMessageText edit,
-            MessageProcessor<USER> processor
-    ) {
-        long chatId = user.getChatId();
-        if (edit == null)
-            processor.processError(bot, user);
-        else
-            sender.sendMessage(bot, chatId, edit, processor::processMessage);
+    public MessageInfoDto createEdit(TelegramClient bot, USER user, Supplier<EditMessageText> editSupplier, MessageProcessor<USER> processor) {
+        return MessageInfoDto.editText(bot, user.getChatId(), editSupplier, processor::processMessage);
     }
 
     @Override
-    public void sendMessage(
-            TelegramClient bot,
-            USER user,
-            AnswerPreCheckoutQuery mes,
-            MessageProcessor<USER> processor
-    ) {
-        long chatId = user.getChatId();
-        if (mes == null)
-            processor.processError(bot, user);
-        else
-            sender.sendMessage(bot, chatId, mes, processor::processMessage);
+    public MessageInfoDto createMessage(TelegramClient bot, USER user, Supplier<AnswerPreCheckoutQuery> mesSupplier, MessageProcessor<USER> processor) {
+        return MessageInfoDto.apcq(bot, user.getChatId(), mesSupplier, processor::processMessage);
     }
 }
