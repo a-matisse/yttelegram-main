@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 
 @Log4j2
 @Builder
-public class BaseSendMessageService implements ISenderService, Runnable {
+public class BaseSendMessageService implements ISenderService, Runnable, AutoCloseable {
     @Builder.Default
     private final BlockingQueue<MessageInfoDto> messageQueue = new LinkedBlockingQueue<>();
     @Builder.Default
@@ -222,5 +222,26 @@ public class BaseSendMessageService implements ISenderService, Runnable {
                 .chatId(chatId)
                 .messageId(messageId)
                 .build();
+    }
+
+    @Override
+    public void close() throws Exception {
+        scheduledThreadPoolExecutor.shutdown();
+        
+        try {
+            // 2. Ждем завершения текущих задач (максимум 5 секунд)
+            if (!scheduledThreadPoolExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                // 3. Принудительно завершаем
+                scheduledThreadPoolExecutor.shutdownNow();
+                // Ждем еще 2 секунды
+                if (!scheduledThreadPoolExecutor.awaitTermination(2, TimeUnit.SECONDS)) {
+                    log.warn("Executor did not terminate");
+                }
+            }
+        } catch (InterruptedException e) {
+            // Восстанавливаем статус прерывания
+            Thread.currentThread().interrupt();
+            scheduledThreadPoolExecutor.shutdownNow();
+        }
     }
 }
