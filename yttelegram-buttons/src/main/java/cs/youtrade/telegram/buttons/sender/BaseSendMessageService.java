@@ -4,7 +4,6 @@ import cs.youtrade.telegram.buttons.TelegramFileDownloader;
 import cs.youtrade.telegram.buttons.util.MessageSentData;
 import cs.youtrade.telegram.buttons.util.TelegramMessageEmptyException;
 import lombok.Builder;
-import lombok.experimental.SuperBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
@@ -34,8 +33,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Log4j2
-@SuperBuilder
-public abstract class BaseSendMessageService implements ISenderService, Runnable {
+@Builder
+public class BaseSendMessageService implements ISenderService, Runnable {
     @Builder.Default
     private final BlockingQueue<MessageInfoDto> messageQueue = new LinkedBlockingQueue<>();
     @Builder.Default
