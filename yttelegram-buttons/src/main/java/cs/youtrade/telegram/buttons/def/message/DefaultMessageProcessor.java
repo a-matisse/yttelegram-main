@@ -14,9 +14,8 @@ public class DefaultMessageProcessor<USER extends AbstractUserData, EDIT> extend
     @NonNull
     private TelegramClient bot;
     @NonNull
-    private Update update;
-    @NonNull
     private USER user;
+    private Update update;
     private Class<EDIT> supportedEdit;
 
     @Override
@@ -25,7 +24,7 @@ public class DefaultMessageProcessor<USER extends AbstractUserData, EDIT> extend
         // Deleting the old message,
         // because there should be no menu duplicates (at least minimize them)
         if (prevMessageId <= 0) {
-            if (update.hasCallbackQuery()) {
+            if (update != null && update.hasCallbackQuery()) {
                 Integer callbackId = update.getCallbackQuery().getMessage().getMessageId();
                 if (callbackId != null)
                     prevMessageId = callbackId;
