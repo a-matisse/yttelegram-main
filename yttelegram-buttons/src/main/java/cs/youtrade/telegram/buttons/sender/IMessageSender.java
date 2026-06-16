@@ -1,7 +1,7 @@
 package cs.youtrade.telegram.buttons.sender;
 
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
-import cs.youtrade.telegram.buttons.def.MessageProcessor;
+import cs.youtrade.telegram.buttons.def.message.MessageProcessor;
 import cs.youtrade.telegram.buttons.util.MessageSentData;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;

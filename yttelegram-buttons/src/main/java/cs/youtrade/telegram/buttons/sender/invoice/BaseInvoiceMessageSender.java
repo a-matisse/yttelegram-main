@@ -1,7 +1,7 @@
 package cs.youtrade.telegram.buttons.sender.invoice;
 
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
-import cs.youtrade.telegram.buttons.def.MessageProcessor;
+import cs.youtrade.telegram.buttons.def.message.MessageProcessor;
 import cs.youtrade.telegram.buttons.sender.BaseMessageSender;
 import cs.youtrade.telegram.buttons.sender.ISenderService;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;

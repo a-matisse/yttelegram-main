@@ -1,4 +1,4 @@
-package cs.youtrade.telegram.buttons.def;
+package cs.youtrade.telegram.buttons.def.message;
 
 import cs.youtrade.telegram.buttons.data.AbstractUserData;
 import cs.youtrade.telegram.buttons.util.MessageSentData;

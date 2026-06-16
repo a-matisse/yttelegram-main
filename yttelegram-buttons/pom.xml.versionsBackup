@@ -13,7 +13,7 @@
     <!-- For uploading on Maven Central -->
     <groupId>xyz.youtradecs</groupId>
     <artifactId>yttelegram-buttons</artifactId>
-    <version>1.2.0</version>
+    <version>1.1.30</version>
 
     <licenses>
         <license>
@@ -45,8 +45,6 @@
         <maven.compiler.target>17</maven.compiler.target>
         <lombok.version>1.18.34</lombok.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Auto-Update config -->
-        <maven.version.ignore>(?i).*-(alpha|beta|rc|m)([-.]?\d+)?</maven.version.ignore>
     </properties>
 
     <dependencyManagement>
@@ -54,7 +52,7 @@
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-bom</artifactId>
-                <version>2.26.0</version>
+                <version>2.25.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -79,7 +77,7 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-client</artifactId>
-            <version>10.0.0</version>
+            <version>9.5.0</version>
         </dependency>
         <!-- LOMBOK -->
         <dependency>
