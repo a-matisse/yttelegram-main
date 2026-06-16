@@ -62,6 +62,7 @@ public abstract class AbstractDefState<USER extends AbstractUserData, STATE exte
                 .bot(bot)
                 .update(update)
                 .user(user)
+                .supportedEdit(supportedEdit())
                 .build();
     }
 
