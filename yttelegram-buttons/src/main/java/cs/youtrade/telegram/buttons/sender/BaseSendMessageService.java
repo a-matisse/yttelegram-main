@@ -160,6 +160,10 @@ public class BaseSendMessageService implements ISenderService, Runnable, AutoClo
         messageQueue.add(messageInfo);
     }
 
+    public boolean isRunning() {
+        return running.get();
+    }
+
     // --- Inner send methods
     private MessageSentData sendText(TelegramClient bot, MessageInfoDto info) throws TelegramApiException {
         SendMessage mes = info.getMessage();
