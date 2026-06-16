@@ -107,7 +107,7 @@ public class BaseSendMessageService implements ISenderService, Runnable, AutoClo
         } catch (TelegramApiException e) {
             if (chatId != -1002332618563L)
                 log.error("Ошибка при отправке сообщения по id={}: {}", chatId, e.getMessage(), e);
-        } catch (TelegramMessageEmptyException e) {
+        } catch (Exception e) {
             log.error(e);
         }
     }
