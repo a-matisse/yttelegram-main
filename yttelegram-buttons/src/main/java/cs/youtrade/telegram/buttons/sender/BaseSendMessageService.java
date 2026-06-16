@@ -29,6 +29,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -45,14 +46,19 @@ public class BaseSendMessageService implements ISenderService, Runnable, AutoClo
     private final Duration messageDelay = Duration.ofMillis(35);
     @Builder.Default
     private final int maxMessageLength = 4096;
+    // Hidden from builder
+    private final AtomicBoolean running = new AtomicBoolean(false);
 
     @Override
     public void run() {
         long delayMillis = messageDelay.toMillis();
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(
-                this::sendMessageFromQueue, 0,
-                delayMillis, TimeUnit.MILLISECONDS
-        );
+        boolean start = running.compareAndSet(false, true);
+        if (start) {
+            scheduledThreadPoolExecutor.scheduleAtFixedRate(
+                    this::sendMessageFromQueue, 0,
+                    delayMillis, TimeUnit.MILLISECONDS
+            );
+        }
     }
 
     private void sendMessageFromQueue() {
@@ -227,7 +233,7 @@ public class BaseSendMessageService implements ISenderService, Runnable, AutoClo
     @Override
     public void close() throws Exception {
         scheduledThreadPoolExecutor.shutdown();
-        
+
         try {
             // 2. Ждем завершения текущих задач (максимум 5 секунд)
             if (!scheduledThreadPoolExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
@@ -242,6 +248,14 @@ public class BaseSendMessageService implements ISenderService, Runnable, AutoClo
             // Восстанавливаем статус прерывания
             Thread.currentThread().interrupt();
             scheduledThreadPoolExecutor.shutdownNow();
+        } finally {
+            this.running.set(false);
+        }
+    }
+
+    public static class BaseSendMessageServiceBuilder {
+        private BaseSendMessageServiceBuilder running(boolean running) {
+            return this;
         }
     }
 }
